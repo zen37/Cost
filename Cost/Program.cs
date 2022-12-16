@@ -1,5 +1,5 @@
 using Cost.Areas.Identity;
-using Cost.Data;
+using Cost_DataAccess;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
