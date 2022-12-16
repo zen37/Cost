@@ -19,5 +19,10 @@ namespace Cost_DataAccess
         [ForeignKey("UserID")]
         public IdentityUser User { get; set; }
 
+        public string CreatedBy { get; set; }
+        public DateTime CreatedTimestamp { get; set; }
+        public string UpdatedBy { get; set; }
+        public DateTime UpdatedTimestamp { get; set; }
+
     }
 }
