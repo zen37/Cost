@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost", "Cost\Cost.csproj", "{D3BFCC66-9C1D-451C-A563-9FACEF8081ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cost_DataAccess", "Cost_DataAccess\Cost_DataAccess.csproj", "{B85B9471-BDC3-43B4-A098-048B184C1ACB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_DataAccess", "Cost_DataAccess\Cost_DataAccess.csproj", "{B85B9471-BDC3-43B4-A098-048B184C1ACB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cost_Models", "Cost_Models\Cost_Models.csproj", "{1F6B7975-D2CD-438E-ABE3-0B45156D891B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_Models", "Cost_Models\Cost_Models.csproj", "{1F6B7975-D2CD-438E-ABE3-0B45156D891B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cost_Common", "Cost_Common\Cost_Common.csproj", "{425778BD-62BC-4787-941B-07D542562698}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_Common", "Cost_Common\Cost_Common.csproj", "{425778BD-62BC-4787-941B-07D542562698}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

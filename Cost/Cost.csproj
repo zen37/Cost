@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Cost_DataAccess\Cost_DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>
