@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Cost_DataAccess;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace Cost.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
+        public DbSet<Component> Components { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
