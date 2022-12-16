@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
 namespace Cost_DataAccess
 {
@@ -10,10 +9,8 @@ namespace Cost_DataAccess
         public string Name { get; set; }
         public double Cost { get; set; }
         public DateTime CostCalculatedLast { get; set; }
-
         [NotMapped]
-        public double CostDynamic{ get; }
-        
+        public double CostDynamic{ get; set; }
         public string Other { get; set; }
         public List<Component> Components { get; set; }
         public bool IsActive { get; set; }

@@ -1,0 +1,51 @@
+﻿@page "/products"
+@using Cost_DataAccess
+
+<PageTitle>Products</PageTitle>
+<h1>Products</h1>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Cost</th>
+                <th>Cost Last Calculated</th>
+                <th>Cost Current</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Cost</td>
+                    <td>@product.CostCalculatedLast</td>
+                    <td>@product.CostDynamic</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private Product[]? products;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        DateTime dt = new DateTime();
+
+        Product oatnilla = new Product { Name = "Oatnilla (Half Gallon)", Cost = 32, CostCalculatedLast = dt, CostDynamic = 34 };
+
+        products = new Product[1];
+        products[0] = oatnilla;
+    }
+}
