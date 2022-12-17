@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Cost_Services.IRepository;
 
 
-namespace Tangy_Business.Repository
+namespace Cost_Services.Repository
 {
     public class CategoryRepository : ICategoryRepository
     {
