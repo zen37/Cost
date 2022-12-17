@@ -1,0 +1,18 @@
+﻿.hero-image {
+    position: relative;
+}
+
+.background {
+    color: white;
+    width: 100%;
+    min-height: 888px;
+    height: calc(100vh - 400px);
+    background: url(images/home.jpg) center center;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+}
+
+.post {
+    margin: calc(100vh - 200px) 0 0 0;
+}
