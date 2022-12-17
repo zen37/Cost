@@ -1,38 +1,47 @@
 ﻿@page "/components"
 @using Cost_DataAccess
 
+@attribute [Authorize]
+
+
 <PageTitle>Ingredients</PageTitle>
-<h1>Ingredients</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Ingredients</h1>
 
-@if (components == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Unit of Measure</th>
-                <th>Other</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var component in components)
-            {
-                <tr>
-                    <td>@component.Name</td>
-                    <td>@component.Price</td>
-                    <td>@component.UoM</td>
-                    <td>@component.Other</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
+        @if (components == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Unit of Measure</th>
+                        <th>Other</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var component in components)
+                    {
+                        <tr>
+                            <td>@component.Name</td>
+                            <td>@component.Price</td>
+                            <td>@component.UoM</td>
+                            <td>@component.Other</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        You are not logged in.
+    </NotAuthorized>
+</AuthorizeView>
 @code {
 
     private Component[]? components;
