@@ -11,3 +11,10 @@ https://stackoverflow.com/questions/27952006/how-should-i-handle-units-of-measur
 Conversion
 https://www.rapidtables.com/convert/
 https://www.unitconverters.net/
+
+Form validation
+https://stackoverflow.com/questions/69724492/blazor-editform-custom-validation-message-on-form-submission
+
+
+
+https://trystanwilcock.com/2022/02/06/how-to-get-the-current-user-in-blazor-c/
