@@ -32,9 +32,14 @@ namespace Cost_Services
             throw new NotImplementedException();
         }
 
-        public Task<ComponentDTO> Get(int id)
+        public async Task<ComponentDTO> Get(int id)
         {
-            throw new NotImplementedException();
+            var obj = await _db.Components.FirstOrDefaultAsync(u => u.Id == id);
+            if (obj != null)
+            {
+                return _mapper.Map<Component, ComponentDTO>(obj);
+            }
+            return new ComponentDTO();
         }
 
         public Task<IEnumerable<ComponentDTO>> GetAll(string userId)
