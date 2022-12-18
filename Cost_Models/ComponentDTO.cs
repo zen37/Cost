@@ -5,6 +5,7 @@ namespace Cost_Models
     public class ComponentDTO
     {
         public int Id { get; set; }
+        public string UserID { get; set; }
 
         [Required(ErrorMessage = "Please enter name")]
         public string Name { get; set; }

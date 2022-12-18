@@ -22,9 +22,19 @@ namespace Cost_Services
             _db = db;
             _mapper = mapper;
         }
-        public Task<ComponentDTO> Create(ComponentDTO objDTO)
+        public async Task<ComponentDTO> Create(ComponentDTO objDTO)
         {
-            throw new NotImplementedException();
+            var obj = _mapper.Map<ComponentDTO, Component>(objDTO);
+
+            obj.CreatedBy = "1@tm.me";
+            obj.CreatedTimestamp = DateTime.Now;
+            obj.UpdatedBy = "1@tm.me";
+            obj.UpdatedTimestamp = DateTime.Now;
+
+            var addedObj = _db.Components.Add(obj);
+            await _db.SaveChangesAsync();
+
+            return _mapper.Map<Component, ComponentDTO>(addedObj.Entity);
         }
 
         public Task<int> Delete(int id)

@@ -40,7 +40,6 @@
                 </div>
                 <div class="form-group py-2">
                     <button class="btn btn-primary">@Title</button>
-                    <NavLink href="category" class="btn btn-secondary">Back to Index</NavLink>
                 </div>
             </EditForm>
         }
@@ -53,10 +52,34 @@
     [Parameter]
     public int Id { get; set; }
 
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+
+    [Inject]
+    UserManager<IdentityUser> userManager { get; set; }
+
+    private string authenticatedUserId;
+
     private bool IsLoading { get; set; }
     private string Title { get; set; } = "Create";
 
     private ComponentDTO Component { get; set; } = new ComponentDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await authenticationState).User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var authenticatedUser = await userManager.GetUserAsync(user);
+            authenticatedUserId = authenticatedUser.Id;
+            //   var currentUserEmail = currentUser.Email;
+        }
+        else
+        {
+            // user is not logged in
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -89,13 +112,14 @@
     {
         if (Component.Id == 0)
         {
+            Component.UserID = authenticatedUserId;
             await _component.Create(Component);
         }
         else
         {
             await _component.Update(Component);
         }
-     //   _nav.NavigateTo("category");
+         _nav.NavigateTo("components");
     }
 
 }
