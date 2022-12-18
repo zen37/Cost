@@ -1,15 +1,18 @@
 ﻿using Cost_DataAccess;
+using Cost_Models;
 
 namespace Cost_Services.IRepository
 {
     public  interface IComponentRepository
     {
-        Task AddComponentAsync(Component component);
-        Task UpdateComponentAsync(Component component);
-        Task<Component>? GetComponentByIdAsync(int componentId);
-        Task DeleteComponentAsync(int componentId);
-        Task<IEnumerable<Component>> GetComponentsByUserIdAsync(string userId);
+        public Task<ComponentDTO> Create(ComponentDTO objDTO);
+        public Task<ComponentDTO> Update(ComponentDTO objDTO);
+        public Task<int> Delete(int id);
+        public Task<ComponentDTO> Get(int id);
+        public Task<IEnumerable<ComponentDTO>> GetAll(string userId);
+
 
         // Task<IEnumerable<Component>> GetComponentsByCategAsync(string user, string category);
+
     }
 }
