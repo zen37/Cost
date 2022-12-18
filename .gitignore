@@ -364,5 +364,5 @@ FodyWeavers.xsd
 
 ## Custom
 # AppSettings
-FindRoommates/appsettings.Development.json
-FindRoommates/appsettings.json
+Cost/appsettings.Development.json
+Cost/appsettings.json
