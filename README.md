@@ -18,3 +18,6 @@ https://stackoverflow.com/questions/69724492/blazor-editform-custom-validation-m
 
 
 https://trystanwilcock.com/2022/02/06/how-to-get-the-current-user-in-blazor-c/
+
+Blazor <InputSelect> inside <EditForm>?
+https://stackoverflow.com/questions/71477626/blazor-inputselect-inside-editform
