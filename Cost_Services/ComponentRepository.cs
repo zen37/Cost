@@ -24,12 +24,13 @@ namespace Cost_Services
         }
         public async Task<ComponentDTO> Create(ComponentDTO objDTO)
         {
+            var dt = DateTime.Now;
             var obj = _mapper.Map<ComponentDTO, Component>(objDTO);
 
-            obj.CreatedBy = "1@tm.me";
-            obj.CreatedTimestamp = DateTime.Now;
-            obj.UpdatedBy = "1@tm.me";
-            obj.UpdatedTimestamp = DateTime.Now;
+            obj.CreatedBy = objDTO.UserID;
+            obj.CreatedTimestamp = dt;
+            obj.UpdatedBy = objDTO.UserID;
+            obj.UpdatedTimestamp = dt;
 
             var addedObj = _db.Components.Add(obj);
             await _db.SaveChangesAsync();
