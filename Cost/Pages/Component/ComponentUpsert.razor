@@ -137,6 +137,7 @@
         }
         else
         {
+            Component.UserId = authenticatedUserId;
             await _component.Update(Component);
         }
         _nav.NavigateTo("components");

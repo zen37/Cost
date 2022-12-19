@@ -38,6 +38,27 @@ namespace Cost_Services
             return _mapper.Map<Component, ComponentDTO>(addedObj.Entity);
         }
 
+        public async Task<ComponentDTO> Update(ComponentDTO objDTO)
+        {
+            var objFromDb = await _db.Components.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
+            if (objFromDb != null) 
+            {
+                objFromDb.Name  = objDTO.Name;
+                objFromDb.Price = objDTO.Price;
+                objFromDb.UoM   = objDTO.UoM;
+                objFromDb.Other = objDTO.Other;
+
+                objFromDb.UpdatedBy         = objDTO.UserId;
+                objFromDb.UpdatedTimestamp  = DateTime.Now;
+
+                _db.Components.Update(objFromDb);
+                await _db.SaveChangesAsync();
+                
+                return _mapper.Map<Component, ComponentDTO>(objFromDb);
+            }
+            return objDTO;
+        }
+
         public Task<int> Delete(int id)
         {
             throw new NotImplementedException();
@@ -61,11 +82,6 @@ namespace Cost_Services
                 (_db.Components.Where(x => x.UserId == userId));
             }
             else { throw new NotImplementedException(); }
-        }
-
-        public Task<ComponentDTO> Update(ComponentDTO objDTO)
-        {
-            throw new NotImplementedException();
         }
     }
 }
