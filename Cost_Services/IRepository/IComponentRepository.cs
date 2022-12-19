@@ -1,9 +1,8 @@
-﻿using Cost_DataAccess;
-using Cost_Models;
+﻿using Cost_Models;
 
 namespace Cost_Services.IRepository
 {
-    public  interface IComponentRepository
+    public interface IComponentRepository
     {
         public Task<ComponentDTO> Create(ComponentDTO objDTO);
         public Task<ComponentDTO> Update(ComponentDTO objDTO);
