@@ -13,11 +13,12 @@ namespace Cost_DataAccess
         public double Price { get; set; } // price per unit of measure
         public string? Other { get; set; }
         public bool IsActive { get; set; }
+        public string UserId { get; set; }
 
-        public string UserID { get; set; }
-
-        [ForeignKey("UserID")]
+        [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
+
+        public ICollection<Product>? Products { get; set; }
 
         public string CreatedBy { get; set; }
         public DateTime CreatedTimestamp { get; set; }

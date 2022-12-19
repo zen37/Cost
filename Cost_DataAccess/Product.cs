@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cost_DataAccess
@@ -12,11 +13,14 @@ namespace Cost_DataAccess
         [NotMapped]
         public double CostDynamic{ get; set; }
         public string Other { get; set; }
-        public List<Component> Components { get; set; }
         public bool IsActive { get; set; }
-        public string UserID { get; set; }
-        [ForeignKey("UserID")]
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
+
+        public ICollection<Component> Components { get; set; }
+
         public string CreatedBy { get; set; }
         public DateTime CreatedTimestamp { get; set; }
         public string UpdatedBy { get; set; }
