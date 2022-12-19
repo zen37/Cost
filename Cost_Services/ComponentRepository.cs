@@ -52,9 +52,14 @@ namespace Cost_Services
             return new ComponentDTO();
         }
 
-        public Task<IEnumerable<ComponentDTO>> GetAll(string userId)
+        public async Task<IEnumerable<ComponentDTO>> GetAll(string userId)
         {
-            throw new NotImplementedException();
+            if (userId != null && userId != "")
+            {
+                return _mapper.Map<IEnumerable<Component>, IEnumerable<ComponentDTO>>
+                (_db.Components.Where(x => x.UserID == userId));
+            }
+            else { throw new NotImplementedException(); }
         }
 
         public Task<ComponentDTO> Update(ComponentDTO objDTO)

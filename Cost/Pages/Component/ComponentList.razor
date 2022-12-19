@@ -1,8 +1,9 @@
 ﻿@page "/components"
 @using Cost_DataAccess;
 
-@attribute [Authorize]
+@inject IComponentRepository _component
 
+@attribute [Authorize]
 
 <PageTitle>Ingredients</PageTitle>
 <AuthorizeView>
@@ -44,22 +45,37 @@
 </AuthorizeView>
 @code {
 
-    private Component[]? components;
+    [Inject]
+    UserManager<IdentityUser> userManager { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+
+    private string authenticatedUserId;
+
+    private IEnumerable<ComponentDTO> components { get; set; } = new List<ComponentDTO>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        //    products = await ProductService.GetProductsAsync();
+        var user = (await authenticationState).User;
 
-        Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
-        Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
-        Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
+        if (user.Identity.IsAuthenticated)
+        {
+            var authenticatedUser = await userManager.GetUserAsync(user);
+            authenticatedUserId = authenticatedUser.Id;
+            components = await _component.GetAll(authenticatedUserId);
+        }
 
-        components = new Component[3];
+        //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
+        //Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
+        //Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
 
-        components[0] = oat;
-        components[1] = cold_brew;
-        components[2] = syrup_vanilla;
+        //components = new Component[3];
+
+        //components[0] = oat;
+        //components[1] = cold_brew;
+        //components[2] = syrup_vanilla;
 
 
     }
