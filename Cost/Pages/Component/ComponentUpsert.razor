@@ -132,7 +132,7 @@
     {
         if (Component.Id == 0)
         {
-            Component.UserID = authenticatedUserId;
+            Component.UserId = authenticatedUserId;
             await _component.Create(Component);
         }
         else

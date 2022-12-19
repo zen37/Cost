@@ -27,9 +27,9 @@ namespace Cost_Services
             var dt = DateTime.Now;
             var obj = _mapper.Map<ComponentDTO, Component>(objDTO);
 
-            obj.CreatedBy = objDTO.UserID;
+            obj.CreatedBy = objDTO.UserId;
             obj.CreatedTimestamp = dt;
-            obj.UpdatedBy = objDTO.UserID;
+            obj.UpdatedBy = objDTO.UserId;
             obj.UpdatedTimestamp = dt;
 
             var addedObj = _db.Components.Add(obj);
@@ -58,7 +58,7 @@ namespace Cost_Services
             if (userId != null && userId != "")
             {
                 return _mapper.Map<IEnumerable<Component>, IEnumerable<ComponentDTO>>
-                (_db.Components.Where(x => x.UserID == userId));
+                (_db.Components.Where(x => x.UserId == userId));
             }
             else { throw new NotImplementedException(); }
         }
