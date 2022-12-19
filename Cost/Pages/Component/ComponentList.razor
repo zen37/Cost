@@ -1,6 +1,7 @@
 ﻿@page "/components"
 
 @inject IComponentRepository _component
+@inject IJSRuntime _jsRuntime
 
 @attribute [Authorize]
 
@@ -32,6 +33,10 @@
                             <td>@component.Price</td>
                             <td>@component.UoM</td>
                             <td>@component.Other</td>
+                            <td>
+                                <NavLink href="@($"/component/edit/{component.Id}")" class="btn-success btn">Edit</NavLink>
+                                <button class="btn btn-danger" @onclick="()=>Delete(component.Id)">Delete</button>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -77,6 +82,11 @@
         //components[2] = syrup_vanilla;
 
 
+    }
+    private void Delete(int id)
+    {
+      //  DeleteCategoryId = id;
+       _jsRuntime.InvokeVoidAsync("NotImplemented");
     }
 }
 
