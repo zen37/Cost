@@ -22,12 +22,15 @@ https://trystanwilcock.com/2022/02/06/how-to-get-the-current-user-in-blazor-c/
 Blazor <InputSelect> inside <EditForm>?
 https://stackoverflow.com/questions/71477626/blazor-inputselect-inside-editform
 
-##lessons
-error creating db: 
+**lessons**
+
+error creating db:
+ 
 "Introducing FOREIGN KEY constraint 'FK_ComponentProduct_Products_ProductsId' on table 'ComponentProduct' may cause cycles or multiple cascade paths. Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints."
 
 
-fix: 
+fix:
+
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ComponentProduct", x => new { x.ComponentsId, x.ProductsId });
