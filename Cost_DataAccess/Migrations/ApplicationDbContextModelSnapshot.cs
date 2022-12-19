@@ -379,12 +379,14 @@ namespace CostDataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("ComponentsId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        //.OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Cost_DataAccess.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                          .OnDelete(DeleteBehavior.Cascade)
+                        //.OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

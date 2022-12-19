@@ -245,13 +245,15 @@ namespace CostDataAccess.Migrations
                         column: x => x.ComponentsId,
                         principalTable: "Components",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
+                    // onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ComponentProduct_Products_ProductsId",
                         column: x => x.ProductsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
+                      //  onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
