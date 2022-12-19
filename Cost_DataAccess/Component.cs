@@ -11,7 +11,7 @@ namespace Cost_DataAccess
         public string Name { get; set; }
         public string UoM { get; set; } //unit of measure kg, liter, kWh, hour, ounce, etc.
         public double Price { get; set; } // price per unit of measure
-        public string Other { get; set; }
+        public string? Other { get; set; }
         public bool IsActive { get; set; }
 
         public string UserID { get; set; }

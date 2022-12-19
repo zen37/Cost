@@ -17,6 +17,6 @@ namespace Cost_Models
 
         [Required(ErrorMessage = "Please enter unit of measure")]
         public string UoM { get; set; } //unit of measure kg, liter, kWh, hour, ounce, etc.
-        public string Other { get; set; }
+        public string? Other { get; set; }
     }
 }
