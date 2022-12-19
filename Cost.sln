@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_Models", "Cost_Models\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_Common", "Cost_Common\Cost_Common.csproj", "{425778BD-62BC-4787-941B-07D542562698}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cost_Services", "Cost_Services\Cost_Services.csproj", "{0883FF22-DC4B-4687-A2A2-D5923B91B889}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cost_Services", "Cost_Services\Cost_Services.csproj", "{0883FF22-DC4B-4687-A2A2-D5923B91B889}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,9 +1,12 @@
-﻿@page "/products"
-@using Cost_DataAccess
+﻿@page "/product/create"
+@page "/product/edit/{id:int}"
+
+@inject NavigationManager _nav
 
 <PageTitle>Products</PageTitle>
 <h1>Products</h1>
 
+@attribute [Authorize]
 @if (products == null)
 {
     <p><em>Loading...</em></p>
