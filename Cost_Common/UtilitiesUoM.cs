@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -11,6 +12,8 @@ namespace Cost_Common
 {
     public static class UtilitiesUoM
     {
+        private static List<string> lstNameUoM = new List<string>();
+
         private static readonly List<UoM> lstUoM = new List<UoM>()
         {
             //weight
@@ -40,10 +43,23 @@ namespace Cost_Common
             (new UoM { Name = "bag",        Abbreviation = "ea",   Class = "material", Factor = 1 })
         };
 
-        //how to call    private List<UoM> variable = Cost_Common.UtilitiesUoM.GetList();
         public static List<UoM> GetList()
         {
             return lstUoM;
+        }
+
+        public static List<string> GetNameUoM()
+        {
+
+            if (!lstNameUoM.Any())
+            {
+                foreach (UoM unit in lstUoM)
+                {
+                    lstNameUoM.Add(unit.Name);
+                }
+            }
+
+            return lstNameUoM;
         }
     }
 }

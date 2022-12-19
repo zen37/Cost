@@ -28,6 +28,7 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cost_Common\Cost_Common.csproj" />
     <ProjectReference Include="..\Cost_Models\Cost_Models.csproj" />
     <ProjectReference Include="..\Cost_Services\Cost_Services.csproj" />
   </ItemGroup>

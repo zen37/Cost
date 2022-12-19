@@ -32,7 +32,19 @@
                     <InputNumber @bind-Value="Component.Price" class="form-control"></InputNumber>
                     <ValidationMessage For="()=>Component.Price"></ValidationMessage>
                     <label>Unit Of Measure</label>
-                    <InputText @bind-Value="Component.UoM" class="form-control"></InputText>
+                    <InputSelect @bind-Value="Component.UoM" class="form-control">
+                            @foreach (var uom in UnitsOfMeasure)
+                            {
+                                @if (uom == Component.UoM)
+                                    {
+                                        <option value="@uom" selected>@Component.UoM</option>
+                                    }
+                                else 
+                                    {
+                                        <option value="@uom">@uom</option>
+                                    }
+                            }
+                    </InputSelect>
                     <ValidationMessage For="()=>Component.UoM"></ValidationMessage>
                     <label>Other</label>
                     <InputTextArea @bind-Value="Component.Other" class="form-control"></InputTextArea>
@@ -65,6 +77,8 @@
 
     private ComponentDTO Component { get; set; } = new ComponentDTO();
 
+    private List<string> UnitsOfMeasure = new List<string>();
+
     protected override async Task OnInitializedAsync()
     {
         var user = (await authenticationState).User;
@@ -74,11 +88,18 @@
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
             //   var currentUserEmail = currentUser.Email;
+
+            if (!UnitsOfMeasure.Any())
+            {
+                UnitsOfMeasure = UtilitiesUoM.GetNameUoM();
+            }
+
         }
         else
         {
             // user is not logged in
         }
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -119,7 +140,7 @@
         {
             await _component.Update(Component);
         }
-         _nav.NavigateTo("components");
+        _nav.NavigateTo("components");
     }
 
 }
