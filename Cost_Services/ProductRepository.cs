@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cost_DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cost_Services
 {
@@ -21,9 +22,20 @@ namespace Cost_Services
             _mapper = mapper;
         }
 
-        public Task<ProductDTO> Create(ProductDTO objDTO)
+        public async Task<ProductDTO> Create(ProductDTO objDTO)
         {
-            throw new NotImplementedException();
+            var dt = DateTime.Now;
+            var obj = _mapper.Map<ProductDTO, Product>(objDTO);
+
+            obj.CreatedBy = objDTO.UserId;
+            obj.CreatedTimestamp = dt;
+            obj.UpdatedBy = objDTO.UserId;
+            obj.UpdatedTimestamp = dt;
+
+            var addedObj = _db.Products.Add(obj);
+            await _db.SaveChangesAsync();
+
+            return _mapper.Map<Product, ProductDTO>(addedObj.Entity);
         }
 
         public Task<int> Delete(int id)
@@ -31,9 +43,14 @@ namespace Cost_Services
             throw new NotImplementedException();
         }
 
-        public Task<ProductDTO> Get(int id)
+        public async Task<ProductDTO> Get(int id)
         {
-            throw new NotImplementedException();
+            var obj = await _db.Products.FirstOrDefaultAsync(u => u.Id == id);
+            if (obj != null)
+            {
+                return _mapper.Map<Product, ProductDTO>(obj);
+            }
+            return new ProductDTO();
         }
 
         public async Task<IEnumerable<ProductDTO>> GetAll(string userId)
@@ -46,9 +63,23 @@ namespace Cost_Services
             else { throw new NotImplementedException(); }
         }
 
-        public Task<ProductDTO> Update(ProductDTO objDTO)
+        public async Task<ProductDTO> Update(ProductDTO objDTO)
         {
-            throw new NotImplementedException();
+            var objFromDb = await _db.Products.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
+            if (objFromDb != null)
+            {
+                objFromDb.Name = objDTO.Name;
+                objFromDb.Other = objDTO.Other;
+
+                objFromDb.UpdatedBy = objDTO.UserId;
+                objFromDb.UpdatedTimestamp = DateTime.Now;
+
+                _db.Products.Update(objFromDb);
+                await _db.SaveChangesAsync();
+
+                return _mapper.Map<Product, ProductDTO>(objFromDb);
+            }
+            return objDTO;
         }
     }
 }
