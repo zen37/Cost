@@ -3,6 +3,7 @@
 
 @inject NavigationManager _nav
 @inject IProductRepository _product
+@inject IComponentRepository _component
 
 <PageTitle>Add Product</PageTitle>
 
@@ -29,6 +30,14 @@
                     <label>Other</label>
                     <InputTextArea @bind-Value="Product.Other" class="form-control"></InputTextArea>
                     <ValidationMessage For="()=>Product.Other"></ValidationMessage>
+
+                    <label>Select Ingredients</label>
+                    <InputSelect @bind-Value="@selectedComponent" class="form-control">
+                        @foreach (var com in components)
+                        {
+                            <option value="@com.Name">@com.Name</option>
+                        }
+                    </InputSelect>
                 </div>
                 <div class="form-group py-2">
                     <button class="btn btn-primary">@Title</button>
@@ -36,6 +45,8 @@
             </EditForm>
         }
     </div>
+
+    @selectedComponent
 </div>
 
 
@@ -56,6 +67,9 @@
     private string Title { get; set; } = "Create";
 
     private ProductDTO Product { get; set; } = new ProductDTO();
+    private IEnumerable<ComponentDTO> components { get; set; } = new List<ComponentDTO>();
+
+    private string selectedComponent { get; set; }
 
     private List<string> UnitsOfMeasure = new List<string>();
 
@@ -67,6 +81,7 @@
         {
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
+            components = await _component.GetAll(authenticatedUserId);
             //   var currentUserEmail = currentUser.Email;
 
             if (!UnitsOfMeasure.Any())
