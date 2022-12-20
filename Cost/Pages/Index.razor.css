@@ -7,7 +7,7 @@
     width: 100%;
     min-height: 888px;
     height: calc(100vh - 400px);
-    background: url(images/home.jpg) center center;
+    background: url(images/home.png) center center;
     background-size: cover;
     position: absolute;
     top: 0;
