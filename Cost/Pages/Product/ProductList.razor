@@ -1,7 +1,96 @@
 ﻿@page "/products"
 
-<h3>Product List</h3>
+@inject IProductRepository _product
+@inject IJSRuntime _jsRuntime
+
+@attribute [Authorize]
+
+<PageTitle>Product</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <h1>Product</h1>
+
+        @if (products == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Cost</th>
+                        <th>Other</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in products)
+                    {
+                        <tr>
+                            <td>@product.Name</td>
+                            <td>@product.Cost</td>
+                            <td>@product.Other</td>
+                            <td>
+                                <NavLink href="@($"/product/edit/{product.Id}")" class="btn-success btn">Edit</NavLink>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        You are not logged in.
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code {
 
+    [Inject]
+    UserManager<IdentityUser> userManager { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+
+    private string authenticatedUserId;
+
+    private IEnumerable<ProductDTO> products { get; set; } = new List<ProductDTO>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await authenticationState).User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var authenticatedUser = await userManager.GetUserAsync(user);
+            authenticatedUserId = authenticatedUser.Id;
+            products = await _product.GetAll(authenticatedUserId);
+        }
+
+        //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
+        //Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
+        //Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
+
+        //components = new Component[3];
+
+        //components[0] = oat;
+        //components[1] = cold_brew;
+        //components[2] = syrup_vanilla;
+
+
+    }
+    private void Delete(int id)
+    {
+        //  DeleteCategoryId = id;
+        _jsRuntime.InvokeVoidAsync("NotImplemented");
+    }
 }
+
