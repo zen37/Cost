@@ -14,7 +14,7 @@ namespace Cost_Models
         public double Cost { get; set; }
         public string Other { get; set; }
 
-        [Required(ErrorMessage = "Please enter at least one ingredient..")]
+        //[Required(ErrorMessage = "Please enter at least one ingredient..")]
         public List<Component> Components { get; set; }
     }
 }
