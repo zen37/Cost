@@ -8,7 +8,14 @@
 <PageTitle>Product</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <h1>Product</h1>
+        <div class="row mt-4">
+            <div class="col-6">
+                <h4 class="card-title text-primary">Product List</h4>
+            </div>
+            <div class="col-4 offset-2">
+                <a href="product/create" class="btn btn-primary form-control">Add New Product</a>
+            </div>
+        </div>
 
         @if (products == null)
         {
@@ -16,33 +23,32 @@
         }
         else
         {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Cost</th>
-                        <th>Other</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var product in products)
-                    {
+            <div class="col-12 p-3">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td>@product.Name</td>
-                            <td>@product.Cost</td>
-                            <td>@product.Other</td>
-                            <td>
-                                <NavLink href="@($"/product/edit/{product.Id}")" class="btn-success btn">Edit</NavLink>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
-                            </td>
+                            <th>Name</th>
+                            <th>Cost</th>
+                            <th>Other</th>
+                            <th>Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in products)
+                        {
+                            <tr>
+                                <td>@product.Name</td>
+                                <td>@product.Cost</td>
+                                <td>@product.Other</td>
+                                <td>
+                                    <NavLink href="@($"/product/edit/{product.Id}")" class="btn-success btn">Edit</NavLink>
+                                    <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
     </Authorized>
     <NotAuthorized>
@@ -55,13 +61,30 @@
 
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
-
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
-
     private string authenticatedUserId;
 
     private IEnumerable<ProductDTO> products { get; set; } = new List<ProductDTO>();
+    public bool isLoading { get; set; }
+    private int DeleteProductId { get; set; } = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadProducts();
+        }
+    }
+
+    private async Task LoadProducts()
+    {
+        isLoading = true;
+        StateHasChanged();
+        products = await _product.GetAll(authenticatedUserId);
+        isLoading = false;
+        StateHasChanged();
+    }
 
 
     protected override async Task OnInitializedAsync()
@@ -72,21 +95,17 @@
         {
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
-            products = await _product.GetAll(authenticatedUserId);
         }
 
         //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
         //Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
         //Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
-
         //components = new Component[3];
-
         //components[0] = oat;
         //components[1] = cold_brew;
         //components[2] = syrup_vanilla;
-
-
     }
+
     private void Delete(int id)
     {
         //  DeleteCategoryId = id;
