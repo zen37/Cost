@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CostDataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class AddProductPriceToDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -231,29 +231,30 @@ namespace CostDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ComponentProduct",
+                name: "ProductPrices",
                 columns: table => new
                 {
-                    ComponentsId = table.Column<int>(type: "int", nullable: false),
-                    ProductsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: true),
+                    ComponentId = table.Column<int>(type: "int", nullable: false),
+                    ComponentUoM = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ComponentProduct", x => new { x.ComponentsId, x.ProductsId });
+                    table.PrimaryKey("PK_ProductPrices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ComponentProduct_Components_ComponentsId",
-                        column: x => x.ComponentsId,
+                        name: "FK_ProductPrices_Components_ComponentId",
+                        column: x => x.ComponentId,
                         principalTable: "Components",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    // onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ComponentProduct_Products_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_ProductPrices_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                      //  onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -296,14 +297,19 @@ namespace CostDataAccess.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ComponentProduct_ProductsId",
-                table: "ComponentProduct",
-                column: "ProductsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Components_UserId",
                 table: "Components",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductPrices_ComponentId",
+                table: "ProductPrices",
+                column: "ComponentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductPrices_ProductId",
+                table: "ProductPrices",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_UserId",
@@ -333,7 +339,7 @@ namespace CostDataAccess.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "ComponentProduct");
+                name: "ProductPrices");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

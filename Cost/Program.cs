@@ -2,10 +2,14 @@ using Cost.Areas.Identity;
 using Cost_DataAccess;
 using Cost_Services;
 using Cost_Services.IRepository;
-
+using Cost_Services.Repository;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
+using Syncfusion.Blazor;
+
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("ODg5MDI4QDMyMzAyZTM0MmUzMG84dU5tamNwL1lpekhvMUlwU2p6b1NGOVZtL1ZydVJnZWJpRjhPTXB1ejQ9");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +24,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = false; });
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddScoped<IComponentRepository, ComponentRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
 
 var app = builder.Build();
 

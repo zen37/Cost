@@ -18,7 +18,8 @@ namespace Cost_DataAccess
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
-        public ICollection<Product>? Products { get; set; }
+        //public ICollection<Product>? Products { get; set; }
+        public ICollection<ProductPrice> ProductPrices { get; set; }
 
         public string CreatedBy { get; set; }
         public DateTime CreatedTimestamp { get; set; }

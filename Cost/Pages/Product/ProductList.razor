@@ -8,7 +8,7 @@
 <PageTitle>Product</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <div class="row mt-4">
+        <div class="row mt-4 p-3">
             <div class="col-6">
                 <h4 class="card-title text-primary">Product List</h4>
             </div>
@@ -41,7 +41,8 @@
                                 <td>@product.Cost</td>
                                 <td>@product.Other</td>
                                 <td>
-                                    <NavLink href="@($"/product/edit/{product.Id}")" class="btn-success btn">Edit</NavLink>
+                                    <NavLink href="@($"/product/edit/{product.Id}")" class="btn-primary btn">Edit</NavLink>
+                                    <NavLink href="@($"/product/price/{product.Id}")" class="btn-success btn">Price</NavLink>
                                     <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
                                 </td>
                             </tr>
