@@ -38,9 +38,9 @@ namespace Cost_Common
             (new UoM { Name = "kWh",        Abbreviation = "kWh",   Class = "energy", Factor = 1 }),
             
             //material
-            (new UoM { Name = "cup",        Abbreviation = "ea",   Class = "material", Factor = 1 }),
-            (new UoM { Name = "lid",        Abbreviation = "ea",   Class = "material", Factor = 1 }),
-            (new UoM { Name = "bag",        Abbreviation = "ea",   Class = "material", Factor = 1 })
+            (new UoM { Name = "each",        Abbreviation = "ea",   Class = "material", Factor = 1 })
+           // (new UoM { Name = "lid",        Abbreviation = "ea",   Class = "material", Factor = 1 }),
+           // (new UoM { Name = "bag",        Abbreviation = "ea",   Class = "material", Factor = 1 })
         };
 
         public static List<UoM> GetList()
