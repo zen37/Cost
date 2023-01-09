@@ -82,7 +82,6 @@
     {
         isLoading = true;
         StateHasChanged();
-        products = await _product.GetAll(authenticatedUserId);
         isLoading = false;
         StateHasChanged();
     }
@@ -96,6 +95,7 @@
         {
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
+            products = await _product.GetAll(authenticatedUserId);
         }
 
         //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
