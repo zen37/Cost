@@ -46,13 +46,13 @@ else
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
-            <GridColumn Field=@nameof(ProductPriceDTO.Amount) HeaderText="Amount" Format="C2"></GridColumn>
-            <GridCommandColumns>
+            <GridColumn Field=@nameof(ProductPriceDTO.Amount) HeaderText="Amount"></GridColumn>
+@*            <GridCommandColumns>
                 <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat"})"></GridCommandColumn>
                 <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat"})"></GridCommandColumn>
                 <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat"})"></GridCommandColumn>
                 <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat"})"></GridCommandColumn>
-            </GridCommandColumns>
+            </GridCommandColumns>*@
         </GridColumns>
     </SfGrid>
 }
@@ -102,9 +102,9 @@ else
     {
         if(args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
         {
+            args.Data.ProductId = Id;
             if (args.Action=="Add")
             {
-
                 await _productPriceRepository.Create(args.Data);
                 ProductPrices = await _productPriceRepository.GetAll(Id);
                 productPriceGrid.Refresh();
