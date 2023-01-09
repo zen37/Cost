@@ -36,10 +36,10 @@
                             <td>@component.UoM</td>
                             <td>@component.Other</td>
                             <td>
-                                <NavLink href="@($"/component/edit/{component.Id}")" class="btn-success btn">Edit</NavLink>
+                                <NavLink href="@($"/component/edit/{component.ComponentId}")" class="btn-success btn">Edit</NavLink>
                             </td>
                             <td>
-                                <button class="btn btn-danger" @onclick="()=>Delete(component.Id)">Delete</button>
+                                <button class="btn btn-danger" @onclick="()=>Delete(component.ComponentId)">Delete</button>
                             </td>
                         </tr>
                     }

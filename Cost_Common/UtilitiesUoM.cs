@@ -13,6 +13,9 @@ namespace Cost_Common
     public static class UtilitiesUoM
     {
         private static List<string> lstNameUoM = new List<string>();
+        private static List<UoM> lstClass = new List<UoM>();
+        private static string? className;
+        private static double factor;
 
         private static readonly List<UoM> lstUoM = new List<UoM>()
         {
@@ -50,7 +53,6 @@ namespace Cost_Common
 
         public static List<string> GetNameUoM()
         {
-
             if (!lstNameUoM.Any())
             {
                 foreach (UoM unit in lstUoM)
@@ -58,8 +60,44 @@ namespace Cost_Common
                     lstNameUoM.Add(unit.Name);
                 }
             }
-
             return lstNameUoM;
+        }
+
+        public static List<UoM> GetListbyAbbreviation(string abbreviation)
+        {
+            var cls = GetClassbyAbbreviation(abbreviation);
+            if (!lstClass.Any())
+            {
+                foreach (UoM unit in lstUoM)
+                {
+                    lstClass.Add(unit);
+                }
+            }
+            return lstClass;
+        }
+
+        public static string GetClassbyAbbreviation(string abbreviation)
+        {
+            foreach (UoM unit in lstUoM)
+            {
+                if (abbreviation == unit.Abbreviation)
+                {
+                    className= unit.Class;
+                }
+            }
+            return className;
+        }
+
+        public static double GetFactorbyUoMName(string UoMName)
+        {
+            foreach (UoM unit in lstUoM)
+            {
+                if (UoMName == unit.Name)
+                {
+                    factor = unit.Factor;
+                }
+            }
+            return factor;
         }
     }
 }

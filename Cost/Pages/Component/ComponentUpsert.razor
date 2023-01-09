@@ -130,9 +130,10 @@
 
     private async Task UpsertComponent()
     {
-        if (Component.Id == 0)
+        if (Component.ComponentId == 0)
         {
             Component.UserId = authenticatedUserId;
+            Component.BasePrice = Component.Price/UtilitiesUoM.GetFactorbyUoMName(Component.UoM);
             await _component.Create(Component);
         }
         else
