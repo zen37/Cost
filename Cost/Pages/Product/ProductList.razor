@@ -42,7 +42,7 @@
                                 <td>@product.Other</td>
                                 <td>
                                     <NavLink href="@($"/product/edit/{product.Id}")" class="btn-primary btn">Edit</NavLink>
-                                    <NavLink href="@($"/product/price/{product.Id}")" class="btn-success btn">Price</NavLink>
+                                    <NavLink href="@($"/product/price/{product.Id}")" class="btn-success btn">Ingredients</NavLink>
                                     <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
                                 </td>
                             </tr>
@@ -67,6 +67,7 @@
     private string authenticatedUserId;
 
     private IEnumerable<ProductDTO> products { get; set; } = new List<ProductDTO>();
+    private IEnumerable<ProductPriceDTO> ProductPrices { get; set; } = new List<ProductPriceDTO>();
     public bool isLoading { get; set; }
     private int DeleteProductId { get; set; } = 0;
 

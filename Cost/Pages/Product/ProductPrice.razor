@@ -2,6 +2,7 @@
 @inject IComponentRepository _componentRepository
 @inject IProductRepository _productRepository
 @inject IProductPriceRepository _productPriceRepository
+@inject NavigationManager _nav
 
 <h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
 @if (isLoading)
@@ -32,29 +33,33 @@ else
         </GridSortSettings>
         <GridPageSettings PageSize="5" PageCount="5" PageSizes="true"></GridPageSettings>
         <GridColumns>
-            <GridColumn IsPrimaryKey="true" AllowAdding="false" Field=@nameof(ProductPriceDTO.ComponentId) HeaderText="Component Name" EditType="EditType.DropDownEdit">
-                <EditTemplate>
-                    <SfDropDownList DataSource="Components" TItem="ComponentDTO" TValue="int" Placeholder="Select a Component" @bind-Value="((context as ProductPriceDTO).ComponentId)">
-                        <DropDownListFieldSettings Text="Name" Value="Id">
-                        </DropDownListFieldSettings>
+            <GridForeignColumn IsPrimaryKey="true" Field=@nameof(ProductPriceDTO.ComponentId) HeaderText="Ingredients Name" ForeignKeyValue="Name" ForeignDataSource="@Components">
+                <FilterTemplate>
+                    <SfDropDownList Placeholder="Select a Ingredient" ID="Name" @bind-Value="@((context as PredicateModel<string>).Value)" TItem="ComponentDTO" TValue="string" DataSource="@Components">
+                        <DropDownListEvents TItem="ComponentDTO" TValue="string" OnValueSelect="@SelectComponent"></DropDownListEvents>
+                        <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
                     </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
+                </FilterTemplate>
+            </GridForeignColumn>
+
             <GridColumn Field=@nameof(ProductPriceDTO.ComponentUoM) HeaderText="UoM">
                 <EditTemplate>
                     <SfDropDownList DataSource="UnitsOfMeasure" TItem="string" TValue="string" Placeholder="Select a Component UoM" @bind-Value="((context as ProductPriceDTO).ComponentUoM)">
+                        <DropDownListEvents TItem="string" TValue="string" OnValueSelect="@SelectUoM"></DropDownListEvents>
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
             <GridColumn Field=@nameof(ProductPriceDTO.Amount) HeaderText="Amount"></GridColumn>
-@*            <GridCommandColumns>
-                <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat"})"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat"})"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat"})"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat"})"></GridCommandColumn>
-            </GridCommandColumns>*@
+            @*            <GridCommandColumns>
+        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat"})"></GridCommandColumn>
+        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat"})"></GridCommandColumn>
+        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat"})"></GridCommandColumn>
+        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat"})"></GridCommandColumn>
+        </GridCommandColumns>*@
         </GridColumns>
     </SfGrid>
+
+    <button class="btn btn-primary" @onclick="()=>Save(Id)">Save</button>
 }
 
 @code {
@@ -77,7 +82,7 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var user = (await authenticationState).User;
-        if(firstRender)
+        if (firstRender)
         {
             isLoading = true;
             StateHasChanged();
@@ -100,24 +105,55 @@ else
 
     public async void ActionHandler(ActionEventArgs<ProductPriceDTO> args)
     {
-        if(args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
         {
             args.Data.ProductId = Id;
-            if (args.Action=="Add")
+            var comp = await _componentRepository.Get(args.Data.ComponentId);
+            args.Data.Price = comp.BasePrice * args.Data.Amount / UtilitiesUoM.GetFactorbyUoMName(args.Data.ComponentUoM);
+
+            if (args.Action == "Add")
             {
                 await _productPriceRepository.Create(args.Data);
                 ProductPrices = await _productPriceRepository.GetAll(Id);
                 productPriceGrid.Refresh();
             }
-            if (args.Action=="Edit")
+            if (args.Action == "Edit")
+            {
+
+                await _productPriceRepository.Update(args.Data);
+            }
+            if (args.Action == "Update")
             {
                 await _productPriceRepository.Update(args.Data);
             }
         }
-        if(args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
         {
             await _productPriceRepository.Delete(args.Data.Id);
             productPriceGrid.Refresh();
         }
     }
+
+    private void SelectComponent(SelectEventArgs<ComponentDTO> args)
+    {
+        Console.WriteLine(args.ItemData);
+    }
+
+    private void SelectUoM(SelectEventArgs<string> args)
+    {
+        Console.WriteLine(args.ItemData);
+    }
+
+    private async void Save(int id)
+    {
+        Product.Cost = 0;
+        ProductPrices = await _productPriceRepository.GetAll(id);
+        foreach (var component in ProductPrices)
+        {
+            Product.Cost += (double)component.Price;
+        }
+        await _productRepository.Update(Product);
+        _nav.NavigateTo("products");
+    }
+
 }

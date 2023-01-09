@@ -17,5 +17,6 @@ namespace Cost_DataAccess
         public Component Component { get; set; }
         public string ComponentUoM { get; set; }
         public double Amount { get; set; }
+        public double Price { get; set; }
     }
 }

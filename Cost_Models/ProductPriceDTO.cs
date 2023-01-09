@@ -18,5 +18,7 @@ namespace Cost_Models
         public string ComponentUoM { get; set; }
         [Required]
         public double Amount { get; set; }
+
+        public double Price { get; set; }
     }
 }

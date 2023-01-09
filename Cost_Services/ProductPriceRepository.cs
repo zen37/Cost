@@ -70,6 +70,8 @@ namespace Cost_Services.Repository
                 objFromDb.ComponentId = objDTO.ComponentId;
                 objFromDb.Amount = objDTO.Amount;
                 objFromDb.ComponentUoM = objDTO.ComponentUoM;
+                objFromDb.Price = objDTO.Price;
+                Console.WriteLine(objFromDb.Price);
                 _db.ProductPrices.Update(objFromDb);
                 await _db.SaveChangesAsync();
                 return _mapper.Map<ProductPrice, ProductPriceDTO>(objFromDb);

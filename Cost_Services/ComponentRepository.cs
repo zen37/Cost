@@ -30,6 +30,7 @@ namespace Cost_Services
             obj.CreatedBy = objDTO.UserId;
             obj.CreatedTimestamp = dt;
             obj.UpdatedBy = objDTO.UserId;
+            obj.BasePrice = objDTO.BasePrice;
             obj.UpdatedTimestamp = dt;
 
             var addedObj = _db.Components.Add(obj);
@@ -40,12 +41,13 @@ namespace Cost_Services
 
         public async Task<ComponentDTO> Update(ComponentDTO objDTO)
         {
-            var objFromDb = await _db.Components.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
+            var objFromDb = await _db.Components.FirstOrDefaultAsync(u => u.ComponentId == objDTO.ComponentId);
             if (objFromDb != null) 
             {
                 objFromDb.Name  = objDTO.Name;
                 objFromDb.Price = objDTO.Price;
                 objFromDb.UoM   = objDTO.UoM;
+                objFromDb.BasePrice = objDTO.BasePrice;
                 objFromDb.Other = objDTO.Other;
 
                 objFromDb.UpdatedBy         = objDTO.UserId;
@@ -66,7 +68,7 @@ namespace Cost_Services
 
         public async Task<ComponentDTO> Get(int id)
         {
-            var obj = await _db.Components.FirstOrDefaultAsync(u => u.Id == id);
+            var obj = await _db.Components.FirstOrDefaultAsync(u => u.ComponentId == id);
             if (obj != null)
             {
                 return _mapper.Map<Component, ComponentDTO>(obj);
