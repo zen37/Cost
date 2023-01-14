@@ -12,7 +12,7 @@ namespace Cost_DataAccess
         public DateTime CostCalculatedLast { get; set; }
         [NotMapped]
         public double CostDynamic{ get; set; }
-        public string Other { get; set; }
+        public string? Other { get; set; }
         public bool IsActive { get; set; }
         public string UserId { get; set; }
 
