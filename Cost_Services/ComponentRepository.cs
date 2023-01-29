@@ -61,9 +61,15 @@ namespace Cost_Services
             return objDTO;
         }
 
-        public Task<int> Delete(int id)
+        public async Task<int> Delete(int id)
         {
-            throw new NotImplementedException();
+            var obj = await _db.Components.FirstOrDefaultAsync(u => u.ComponentId == id);
+            if (obj != null)
+            {
+                _db.Components.Remove(obj);
+                return await _db.SaveChangesAsync();
+            }
+            return 0;
         }
 
         public async Task<ComponentDTO> Get(int id)

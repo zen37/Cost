@@ -8,6 +8,7 @@
 <PageTitle>Product</PageTitle>
 <AuthorizeView>
     <Authorized>
+        <_DeleteConfirmation ConfirmationChanged="ConfirmDelete_Click"></_DeleteConfirmation>
         <div class="row mt-4 p-3">
             <div class="col-6">
                 <h4 class="card-title text-primary">Product List</h4>
@@ -71,27 +72,17 @@
     public bool isLoading { get; set; }
     private int DeleteProductId { get; set; } = 0;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await LoadProducts();
-        }
-    }
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        await LoadProducts();
+    //    }
+    //}
 
     private async Task LoadProducts()
     {
-        isLoading = true;
-        StateHasChanged();
-        isLoading = false;
-        StateHasChanged();
-    }
-
-
-    protected override async Task OnInitializedAsync()
-    {
         var user = (await authenticationState).User;
-
         if (user.Identity.IsAuthenticated)
         {
             var authenticatedUser = await userManager.GetUserAsync(user);
@@ -99,19 +90,30 @@
             products = await _product.GetAll(authenticatedUserId);
         }
 
-        //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
-        //Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
-        //Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
-        //components = new Component[3];
-        //components[0] = oat;
-        //components[1] = cold_brew;
-        //components[2] = syrup_vanilla;
+        isLoading = false;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(LoadProducts);
     }
 
     private void Delete(int id)
     {
-        //  DeleteCategoryId = id;
-        _jsRuntime.InvokeVoidAsync("NotImplemented");
+        DeleteProductId = id;
+        _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    public async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        if (isConfirmed && DeleteProductId != 0)
+        {
+            // delete
+            await _product.Delete(DeleteProductId);
+            await LoadProducts();
+            await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        }
     }
 }
 
