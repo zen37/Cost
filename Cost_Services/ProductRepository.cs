@@ -38,9 +38,15 @@ namespace Cost_Services
             return _mapper.Map<Product, ProductDTO>(addedObj.Entity);
         }
 
-        public Task<int> Delete(int id)
+        public async Task<int> Delete(int id)
         {
-            throw new NotImplementedException();
+            var obj = await _db.Products.FirstOrDefaultAsync(u => u.Id == id);
+            if (obj != null)
+            {
+                _db.Products.Remove(obj);
+                return await _db.SaveChangesAsync();
+            }
+            return 0;
         }
 
         public async Task<ProductDTO> Get(int id)

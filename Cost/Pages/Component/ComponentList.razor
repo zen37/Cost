@@ -8,6 +8,7 @@
 <PageTitle>Ingredients</PageTitle>
 <AuthorizeView>
     <Authorized>
+        <_DeleteConfirmation ConfirmationChanged="ConfirmDelete_Click"></_DeleteConfirmation>
         <h1>Ingredients</h1>
 
         @if (components == null)
@@ -55,19 +56,23 @@
 
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
-
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
-
     private string authenticatedUserId;
 
+    public bool isLoading { get; set; } = true;
+    private int DeleteComponentId { get; set; } = 0;
     private IEnumerable<ComponentDTO> components { get; set; } = new List<ComponentDTO>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await authenticationState).User;
+        await Task.Run(LoadComponents);
+    }
 
+    private async Task LoadComponents()
+    {
+        var user = (await authenticationState).User;
         if (user.Identity.IsAuthenticated)
         {
             var authenticatedUser = await userManager.GetUserAsync(user);
@@ -75,22 +80,24 @@
             components = await _component.GetAll(authenticatedUserId);
         }
 
-        //Component oat = new Component { Name = "Oat Milk", Price = 3.23, UoM = "Liter", Other = "Plant Milks"};
-        //Component cold_brew = new Component { Name = "Cold Brew", Price = 17.87, UoM = "Liter", Other = "Fulcrum Coffee" };
-        //Component syrup_vanilla = new Component { Name = "Organic Syrup Vanila", Price = 97, UoM = "Liter", Other = "Madagascar" };
-
-        //components = new Component[3];
-
-        //components[0] = oat;
-        //components[1] = cold_brew;
-        //components[2] = syrup_vanilla;
-
-
+        isLoading = false;
     }
+
     private void Delete(int id)
     {
-      //  DeleteCategoryId = id;
-       _jsRuntime.InvokeVoidAsync("NotImplemented");
+        DeleteComponentId = id;
+        _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    public async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        if (isConfirmed && DeleteComponentId != 0)
+        {
+            // delete
+            await _component.Delete(DeleteComponentId);
+            await LoadComponents();
+            await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        }
     }
 }
 
