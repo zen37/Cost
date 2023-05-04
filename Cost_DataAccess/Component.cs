@@ -15,12 +15,13 @@ namespace Cost_DataAccess
         public string? Other { get; set; }
         public bool IsActive { get; set; }
         public string UserId { get; set; }
+        public double Wastage { get; set; }
 
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
         //public ICollection<Product>? Products { get; set; }
-        public ICollection<ProductPrice> ProductPrices { get; set; }
+        //public ICollection<ProductComponent> ProductComponent { get; set; }
 
         public string CreatedBy { get; set; }
         public DateTime CreatedTimestamp { get; set; }

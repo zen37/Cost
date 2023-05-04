@@ -1,7 +1,7 @@
 ﻿@page "/product/price/{Id:int}"
 @inject IComponentRepository _componentRepository
 @inject IProductRepository _productRepository
-@inject IProductPriceRepository _productPriceRepository
+@inject IProductComponentRepository _ProductComponentRepository
 @inject NavigationManager _nav
 
 <h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
@@ -22,9 +22,9 @@ else
         </div>
     </div>
 
-    <SfGrid @ref="productPriceGrid" DataSource="@ProductPrices" AllowPaging="true" Toolbar="@(new List<string>{"Add", "Edit", "Update", "Delete", "Cancel"})" AllowFiltering="true" AllowSorting="true">
+    <SfGrid @ref="ProductComponentGrid" DataSource="@ProductComponents" AllowPaging="true" Toolbar="@(new List<string>{"Add", "Edit", "Update", "Delete", "Cancel"})" AllowFiltering="true" AllowSorting="true">
         <GridEditSettings AllowAdding="true" AllowEditing="true" ShowDeleteConfirmDialog="true" AllowDeleting="true"></GridEditSettings>
-        <GridEvents OnActionBegin="ActionHandler" TValue="ProductPriceDTO"></GridEvents>
+        <GridEvents OnActionBegin="ActionHandler" TValue="ProductComponentDTO"></GridEvents>
         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
         <GridSortSettings AllowUnsort="false">
             <GridSortColumns>
@@ -33,7 +33,7 @@ else
         </GridSortSettings>
         <GridPageSettings PageSize="5" PageCount="5" PageSizes="true"></GridPageSettings>
         <GridColumns>
-            <GridForeignColumn IsPrimaryKey="true" Field=@nameof(ProductPriceDTO.ComponentId) HeaderText="Ingredients Name" ForeignKeyValue="Name" ForeignDataSource="@Components">
+            <GridForeignColumn Field=@nameof(ProductComponentDTO.ComponentIngredientId) HeaderText="Ingredients Name" ForeignKeyValue="Name" ForeignDataSource="@Components">
                 <FilterTemplate>
                     <SfDropDownList Placeholder="Select a Ingredient" ID="Name" @bind-Value="@((context as PredicateModel<string>).Value)" TItem="ComponentDTO" TValue="string" DataSource="@Components">
                         <DropDownListEvents TItem="ComponentDTO" TValue="string" OnValueSelect="@SelectComponent"></DropDownListEvents>
@@ -42,15 +42,24 @@ else
                 </FilterTemplate>
             </GridForeignColumn>
 
-            <GridColumn Field=@nameof(ProductPriceDTO.ComponentUoM) HeaderText="UoM">
-                <EditTemplate>
-                    <SfDropDownList DataSource="UnitsOfMeasure" TItem="string" TValue="string" Placeholder="Select a Component UoM" @bind-Value="((context as ProductPriceDTO).ComponentUoM)">
-                        <DropDownListEvents TItem="string" TValue="string" OnValueSelect="@SelectUoM"></DropDownListEvents>
+            <GridForeignColumn IsPrimaryKey="true" Field=@nameof(ProductComponentDTO.ComponentProductId) HeaderText="Products Name" ForeignKeyValue="Name" ForeignDataSource="@Products">
+                <FilterTemplate>
+                    <SfDropDownList Placeholder="Select a Product" ID="Name" @bind-Value="@((context as PredicateModel<string>).Value)" TItem="ProductDTO" TValue="string" DataSource="@Products">
+                        <DropDownListEvents TItem="ProductDTO" TValue="string" OnValueSelect="@SelectProduct"></DropDownListEvents>
+                        <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
                     </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductPriceDTO.Amount) HeaderText="Amount"></GridColumn>
-            @*            <GridCommandColumns>
+                </FilterTemplate>
+            </GridForeignColumn>
+
+            @*<GridColumn Field=@nameof(ProductComponentDTO.ComponentUoM) HeaderText="UoM">
+            <EditTemplate>
+                <SfDropDownList DataSource="UnitsOfMeasure" TItem="string" TValue="string" Placeholder="Select a Component UoM" @bind-Value="((context as ProductComponentDTO).ComponentUoM)">
+                    <DropDownListEvents TItem="string" TValue="string" OnValueSelect="@SelectUoM"></DropDownListEvents>
+                </SfDropDownList>
+            </EditTemplate>
+        </GridColumn>*@
+            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount"></GridColumn>
+            @*<GridCommandColumns>
         <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat"})"></GridCommandColumn>
         <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat"})"></GridCommandColumn>
         <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat"})"></GridCommandColumn>
@@ -67,9 +76,10 @@ else
     public int Id { get; set; }
     private ProductDTO Product { get; set; } = new();
     private IEnumerable<ComponentDTO> Components { get; set; } = new List<ComponentDTO>();
-    private IEnumerable<ProductPriceDTO> ProductPrices { get; set; } = new List<ProductPriceDTO>();
+    private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
+    private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     private bool isLoading { get; set; } = true;
-    public SfGrid<ProductPriceDTO> productPriceGrid;
+    public SfGrid<ProductComponentDTO> ProductComponentGrid;
 
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
@@ -87,10 +97,11 @@ else
             isLoading = true;
             StateHasChanged();
             Product = await _productRepository.Get(Id);
-            ProductPrices = await _productPriceRepository.GetAll(Id);
+            ProductComponents = await _ProductComponentRepository.GetAll(Id);
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
             Components = await _componentRepository.GetAll(authenticatedUserId);
+            Products = await _productRepository.GetAll(authenticatedUserId);
             isLoading = false;
 
             if (!UnitsOfMeasure.Any())
@@ -103,38 +114,43 @@ else
 
     }
 
-    public async void ActionHandler(ActionEventArgs<ProductPriceDTO> args)
+    public async void ActionHandler(ActionEventArgs<ProductComponentDTO> args)
     {
         if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
         {
-            args.Data.ProductId = Id;
-            var comp = await _componentRepository.Get(args.Data.ComponentId);
-            args.Data.Price = comp.BasePrice * args.Data.Amount / UtilitiesUoM.GetFactorbyUoMName(args.Data.ComponentUoM);
+            var ingredient = await _componentRepository.Get(args.Data.ComponentIngredientId);
+            //args.Data.Price = ingredient.BasePrice * args.Data.Amount / UtilitiesUoM.GetFactorbyUoMName(args.Data.ComponentUoM);
 
             if (args.Action == "Add")
             {
-                await _productPriceRepository.Create(args.Data);
-                ProductPrices = await _productPriceRepository.GetAll(Id);
-                productPriceGrid.Refresh();
+                args.Data.ProductId = Id;
+                await _ProductComponentRepository.Create(args.Data);
+                ProductComponents = await _ProductComponentRepository.GetAll(Id);
+                ProductComponentGrid.Refresh();
             }
             if (args.Action == "Edit")
             {
 
-                await _productPriceRepository.Update(args.Data);
+                await _ProductComponentRepository.Update(args.Data);
             }
             if (args.Action == "Update")
             {
-                await _productPriceRepository.Update(args.Data);
+                await _ProductComponentRepository.Update(args.Data);
             }
         }
         if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
         {
-            await _productPriceRepository.Delete(args.Data.Id);
-            productPriceGrid.Refresh();
+            await _ProductComponentRepository.Delete(args.Data.ProductId);
+            ProductComponentGrid.Refresh();
         }
     }
 
     private void SelectComponent(SelectEventArgs<ComponentDTO> args)
+    {
+        Console.WriteLine(args.ItemData);
+    }
+
+    private void SelectProduct(SelectEventArgs<ProductDTO> args)
     {
         Console.WriteLine(args.ItemData);
     }
@@ -147,13 +163,12 @@ else
     private async void Save(int id)
     {
         Product.Cost = 0;
-        ProductPrices = await _productPriceRepository.GetAll(id);
-        foreach (var component in ProductPrices)
-        {
-            Product.Cost += (double)component.Price;
-        }
+        ProductComponents = await _ProductComponentRepository.GetAll(id);
+        //foreach (var component in ProductComponent)
+        //{
+        //    Product.Cost += (double)component.Price;
+        //}
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
     }
-
 }

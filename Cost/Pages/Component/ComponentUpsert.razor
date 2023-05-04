@@ -32,18 +32,20 @@
                     <ValidationMessage For="()=>Component.Price"></ValidationMessage>
                     <label>Unit Of Measure</label>
                     <InputSelect @bind-Value="Component.UoM" class="form-control">
-                            @foreach (var uom in UnitsOfMeasure)
+                        @foreach (var uom in UnitsOfMeasure)
+                        {
+                            @if (uom == Component.UoM)
                             {
-                                @if (uom == Component.UoM)
-                                    {
-                                        <option value="@uom" selected>@Component.UoM</option>
-                                    }
-                                else 
-                                    {
-                                        <option value="@uom">@uom</option>
-                                    }
+                                <option value="@uom" selected>@Component.UoM</option>
                             }
+                            else
+                            {
+                                <option value="@uom">@uom</option>
+                            }
+                        }
                     </InputSelect>
+                    <label>Wastage</label>
+                    <InputNumber @bind-Value="Component.Wastage" class="form-control"></InputNumber>
                     <ValidationMessage For="()=>Component.UoM"></ValidationMessage>
                     <label>Other</label>
                     <InputTextArea @bind-Value="Component.Other" class="form-control"></InputTextArea>

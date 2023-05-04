@@ -9,16 +9,12 @@ using System.Threading.Tasks;
 
 namespace Cost_Models
 {
-    public class ProductPriceDTO
+    public class ProductComponentDTO
     {
         public int Id { get; set; }
-        public int? ProductId { get; set; }
-        [Required]
-        public int ComponentId { get; set; }
-        public string ComponentUoM { get; set; }
-        [Required]
+        public int ProductId { get; set; }
+        public int ComponentIngredientId { get; set; }
+        public int ComponentProductId { get; set; }
         public double Amount { get; set; }
-
-        public double Price { get; set; }
     }
 }

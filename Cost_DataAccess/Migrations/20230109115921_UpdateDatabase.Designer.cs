@@ -162,7 +162,7 @@ namespace CostDataAccess.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Cost_DataAccess.ProductPrice", b =>
+            modelBuilder.Entity("Cost_DataAccess.ProductComponent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +192,7 @@ namespace CostDataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPrices");
+                    b.ToTable("ProductComponent");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -419,16 +419,16 @@ namespace CostDataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Cost_DataAccess.ProductPrice", b =>
+            modelBuilder.Entity("Cost_DataAccess.ProductComponent", b =>
                 {
                     b.HasOne("Cost_DataAccess.Component", "Component")
-                        .WithMany("ProductPrices")
+                        .WithMany("ProductComponent")
                         .HasForeignKey("ComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Cost_DataAccess.Product", "Product")
-                        .WithMany("ProductPrices")
+                        .WithMany("ProductComponent")
                         .HasForeignKey("ProductId");
 
                     b.Navigation("Component");
@@ -489,12 +489,12 @@ namespace CostDataAccess.Migrations
 
             modelBuilder.Entity("Cost_DataAccess.Component", b =>
                 {
-                    b.Navigation("ProductPrices");
+                    b.Navigation("ProductComponent");
                 });
 
             modelBuilder.Entity("Cost_DataAccess.Product", b =>
                 {
-                    b.Navigation("ProductPrices");
+                    b.Navigation("ProductComponent");
                 });
 #pragma warning restore 612, 618
         }

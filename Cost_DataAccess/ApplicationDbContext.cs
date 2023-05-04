@@ -13,7 +13,7 @@ namespace Cost_DataAccess
         public DbSet<Category> Categories { get; set; }
         public DbSet<Component> Components { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductPrice> ProductPrices { get; set; }
+        public DbSet<ProductComponent> ProductComponent { get; set; }
 
     }
 }
