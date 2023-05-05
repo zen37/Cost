@@ -24,7 +24,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = false; });
+//builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = false; });
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddScoped<IComponentRepository, ComponentRepository>();

@@ -22,51 +22,87 @@ else
         </div>
     </div>
 
-    <SfGrid @ref="ProductComponentGrid" DataSource="@ProductComponents" AllowPaging="true" Toolbar="@(new List<string>{"Add", "Edit", "Update", "Delete", "Cancel"})" AllowFiltering="true" AllowSorting="true">
-        <GridEditSettings AllowAdding="true" AllowEditing="true" ShowDeleteConfirmDialog="true" AllowDeleting="true"></GridEditSettings>
-        <GridEvents OnActionBegin="ActionHandler" TValue="ProductComponentDTO"></GridEvents>
-        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
-        <GridSortSettings AllowUnsort="false">
-            <GridSortColumns>
-                <GridSortColumn Field="Amount" Direction="SortDirection.Ascending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridPageSettings PageSize="5" PageCount="5" PageSizes="true"></GridPageSettings>
-        <GridColumns>
-            <GridForeignColumn Field=@nameof(ProductComponentDTO.ComponentIngredientId) HeaderText="Ingredients Name" ForeignKeyValue="Name" ForeignDataSource="@Components">
-                <FilterTemplate>
-                    <SfDropDownList Placeholder="Select a Ingredient" ID="Name" @bind-Value="@((context as PredicateModel<string>).Value)" TItem="ComponentDTO" TValue="string" DataSource="@Components">
-                        <DropDownListEvents TItem="ComponentDTO" TValue="string" OnValueSelect="@SelectComponent"></DropDownListEvents>
-                        <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
-                    </SfDropDownList>
-                </FilterTemplate>
-            </GridForeignColumn>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-1"></th>
+                            <th scope="col" class="col-4">Ingredient</th>
+                            <th scope="col" class="col-2">Amount</th>
+                            <th scope="col" class="col-3">UoM</th>
+                            <th scope="col" class="col-2">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var component in @Components)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="@component.ComponentId" @bind="@IngredientCheckedItems[component.ComponentId]">
+                                    </div>
+                                </td>
+                                <td>@component.Name</td>
+                                <td><input type="number" name="apple" value="0" min="0" disabled="@(!IngredientCheckedItems[component.ComponentId])"></td>
+                                <td>g</td>
+                                <td>@component.Price</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-light">
+                            <td colspan="4">Total Component Price:</td>
+                            <td>@TotalIngredientPrice</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
 
-            <GridForeignColumn IsPrimaryKey="true" Field=@nameof(ProductComponentDTO.ComponentProductId) HeaderText="Products Name" ForeignKeyValue="Name" ForeignDataSource="@Products">
-                <FilterTemplate>
-                    <SfDropDownList Placeholder="Select a Product" ID="Name" @bind-Value="@((context as PredicateModel<string>).Value)" TItem="ProductDTO" TValue="string" DataSource="@Products">
-                        <DropDownListEvents TItem="ProductDTO" TValue="string" OnValueSelect="@SelectProduct"></DropDownListEvents>
-                        <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
-                    </SfDropDownList>
-                </FilterTemplate>
-            </GridForeignColumn>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-1"></th>
+                            <th scope="col" class="col-4">Product</th>
+                            <th scope="col" class="col-2">Amount</th>
+                            <th scope="col" class="col-3">UoM</th>
+                            <th scope="col" class="col-2">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in @Products)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="@product.Id" @bind="@ProductCheckedItems[product.Id]">
+                                    </div>
+                                </td>
+                                <td>@product.Name</td>
+                                <td><input type="number" name="apple" value="0" min="0" disabled="@(!ProductCheckedItems[product.Id])"></td>
+                                <td>g</td>
+                                <td>@product.Cost</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-light">
+                            <td colspan="4">Total Product Price:</td>
+                            <td>@TotalProductPrice</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
 
-            @*<GridColumn Field=@nameof(ProductComponentDTO.ComponentUoM) HeaderText="UoM">
-            <EditTemplate>
-                <SfDropDownList DataSource="UnitsOfMeasure" TItem="string" TValue="string" Placeholder="Select a Component UoM" @bind-Value="((context as ProductComponentDTO).ComponentUoM)">
-                    <DropDownListEvents TItem="string" TValue="string" OnValueSelect="@SelectUoM"></DropDownListEvents>
-                </SfDropDownList>
-            </EditTemplate>
-        </GridColumn>*@
-            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount"></GridColumn>
-            @*<GridCommandColumns>
-        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat"})"></GridCommandColumn>
-        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat"})"></GridCommandColumn>
-        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat"})"></GridCommandColumn>
-        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat"})"></GridCommandColumn>
-        </GridCommandColumns>*@
-        </GridColumns>
-    </SfGrid>
+
 
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Save</button>
 }
@@ -79,7 +115,8 @@ else
     private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     private bool isLoading { get; set; } = true;
-    public SfGrid<ProductComponentDTO> ProductComponentGrid;
+    public Dictionary<int, bool> IngredientCheckedItems { get; set; } = new Dictionary<int, bool>();
+    public Dictionary<int, bool> ProductCheckedItems { get; set; } = new Dictionary<int, bool>();
 
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
@@ -109,56 +146,23 @@ else
                 UnitsOfMeasure = UtilitiesUoM.GetNameUoM();
             }
 
+            foreach (var component in Components)
+            {
+                IngredientCheckedItems.Add(component.ComponentId, false);
+            }
+
+            foreach (var product in Products)
+            {
+                ProductCheckedItems.Add(product.Id, false);
+            }
+
             StateHasChanged();
         }
 
     }
 
-    public async void ActionHandler(ActionEventArgs<ProductComponentDTO> args)
-    {
-        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
-        {
-            var ingredient = await _componentRepository.Get(args.Data.ComponentIngredientId);
-            //args.Data.Price = ingredient.BasePrice * args.Data.Amount / UtilitiesUoM.GetFactorbyUoMName(args.Data.ComponentUoM);
-
-            if (args.Action == "Add")
-            {
-                args.Data.ProductId = Id;
-                await _ProductComponentRepository.Create(args.Data);
-                ProductComponents = await _ProductComponentRepository.GetAll(Id);
-                ProductComponentGrid.Refresh();
-            }
-            if (args.Action == "Edit")
-            {
-
-                await _ProductComponentRepository.Update(args.Data);
-            }
-            if (args.Action == "Update")
-            {
-                await _ProductComponentRepository.Update(args.Data);
-            }
-        }
-        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
-        {
-            await _ProductComponentRepository.Delete(args.Data.ProductId);
-            ProductComponentGrid.Refresh();
-        }
-    }
-
-    private void SelectComponent(SelectEventArgs<ComponentDTO> args)
-    {
-        Console.WriteLine(args.ItemData);
-    }
-
-    private void SelectProduct(SelectEventArgs<ProductDTO> args)
-    {
-        Console.WriteLine(args.ItemData);
-    }
-
-    private void SelectUoM(SelectEventArgs<string> args)
-    {
-        Console.WriteLine(args.ItemData);
-    }
+    public double TotalIngredientPrice => Components.Where(i => IngredientCheckedItems[i.ComponentId]).Sum(i => i.Price);
+    public double TotalProductPrice => Products.Where(i => ProductCheckedItems[i.Id]).Sum(i => i.Cost);
 
     private async void Save(int id)
     {
