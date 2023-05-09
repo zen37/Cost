@@ -20,16 +20,26 @@ namespace Cost_Services.Repository
 
         public async Task<ProductComponentDTO> Create(ProductComponentDTO objDTO)
         {
-            var obj = _mapper.Map<ProductComponentDTO, ProductComponent>(objDTO);
-            var addedObj = _db.ProductComponent.Add(obj);
-            await _db.SaveChangesAsync();
-
-            return _mapper.Map<ProductComponent, ProductComponentDTO>(addedObj.Entity);
+            try
+            {
+                var objFromDb = await _db.ProductComponent.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
+                if (objFromDb == null)
+                {
+                    var objConverted = _mapper.Map<ProductComponentDTO, ProductComponent>(objDTO);
+                    await _db.ProductComponent.AddAsync(objConverted);
+                }
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                }
+            return objDTO;
         }
 
         public async Task<int> Delete(int id)
         {
-            var obj = await _db.ProductComponent.FirstOrDefaultAsync(u => u.ProductId == id);
+            var obj = await _db.ProductComponent.FirstOrDefaultAsync(u => u.Id == id);
             if (obj != null)
             {
                 _db.ProductComponent.Remove(obj);
@@ -53,7 +63,7 @@ namespace Cost_Services.Repository
             if (id != null && id > 0)
             {
                 return _mapper.Map<IEnumerable<ProductComponent>, IEnumerable<ProductComponentDTO>>
-                    (_db.ProductComponent.Where(u=>u.ProductId == id));
+                    (_db.ProductComponent.Where(u => u.ProductId == id));
             }
             else
             {
@@ -63,18 +73,21 @@ namespace Cost_Services.Repository
 
         public async Task<ProductComponentDTO> Update(ProductComponentDTO objDTO)
         {
-            var objFromDb = await _db.ProductComponent.FirstOrDefaultAsync(u => u.ProductId == objDTO.ProductId);
-            if (objFromDb != null)
+            try
             {
-                objFromDb.ProductId= objDTO.ProductId;
-                objFromDb.ComponentIngredientId = objDTO.ComponentIngredientId;
-                objFromDb.Amount = objDTO.Amount;
-                //objFromDb.ComponentUoM = objDTO.ComponentUoM;
-                //objFromDb.Price = objDTO.Price;
-                //Console.WriteLine(objFromDb.Price);
-                _db.ProductComponent.Update(objFromDb);
+                var objFromDb = await _db.ProductComponent.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
+                if (objFromDb != null)
+                {
+                    objFromDb.ProductId = objDTO.ProductId;
+                    objFromDb.ComponentIngredientId = objDTO.ComponentIngredientId;
+                    objFromDb.ComponentProductId = objDTO.ComponentProductId;
+                    objFromDb.Amount = objDTO.Amount;
+                }
                 await _db.SaveChangesAsync();
-                return _mapper.Map<ProductComponent, ProductComponentDTO>(objFromDb);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             return objDTO;
         }

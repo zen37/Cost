@@ -23,6 +23,7 @@
     <PackageReference Include="Syncfusion.Blazor.Grid" Version="21.2.3" />
     <PackageReference Include="Syncfusion.Blazor.RichTextEditor" Version="21.2.3" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="21.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.0-preview.3.23177.8" />
   </ItemGroup>
 
   <ItemGroup>

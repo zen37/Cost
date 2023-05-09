@@ -13,8 +13,8 @@ namespace Cost_Models
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public int ComponentIngredientId { get; set; }
-        public int ComponentProductId { get; set; }
+        public int? ComponentIngredientId { get; set; }
+        public int? ComponentProductId { get; set; }
         public double Amount { get; set; }
     }
 }
