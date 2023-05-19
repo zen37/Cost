@@ -22,86 +22,42 @@ else
         </div>
     </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="col-1"></th>
-                            <th scope="col" class="col-4">Ingredient</th>
-                            <th scope="col" class="col-2">Amount</th>
-                            <th scope="col" class="col-3">UoM</th>
-                            <th scope="col" class="col-2">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var component in @Components)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="@component.ComponentId" @bind="@IngredientCheckedItems[component.ComponentId]">
-                                    </div>
-                                </td>
-                                <td>@component.Name</td>
-                                <td><input type="number" name="apple" value="0" min="0" disabled="@(!IngredientCheckedItems[component.ComponentId])"></td>
-                                <td>g</td>
-                                <td>@component.Price</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr class="table-light">
-                            <td colspan="4">Total Component Price:</td>
-                            <td>@TotalIngredientPrice</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
+    <SfGrid @ref="GridRef" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })">
+        <GridPageSettings PageSize="5"></GridPageSettings>
+        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
+            <Template>
+                @{
+                    var PC = (context as ProductComponentDTO);
+                    <div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Category</label>
+                                <SfDropDownList TValue="string" TItem="string" @bind-Value="@PC.Category" DataSource="@Category" Enabled="@((PC.Id == 0) ? true : false)">
+                                    <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            </div>
+                            <div class="col">
+                                <label>Name</label>
+                                <SfDropDownList TValue="string" TItem="string" ID="Name" @bind-Value="@(PC.Name)" Enabled="@((PC.Id == 0) ? true : false)" DataSource="@NameSource">
+                                </SfDropDownList>
+                            </div>
+                            <div class="col">
+                                <label>Amount</label>
+                                <SfNumericTextBox ID="Amount" @bind-Value="@(PC.Amount)"></SfNumericTextBox>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </Template>
+        </GridEditSettings>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="col-1"></th>
-                            <th scope="col" class="col-4">Product</th>
-                            <th scope="col" class="col-2">Amount</th>
-                            <th scope="col" class="col-3">UoM</th>
-                            <th scope="col" class="col-2">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var product in @Products)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="@product.Id" @bind="@ProductCheckedItems[product.Id]">
-                                    </div>
-                                </td>
-                                <td>@product.Name</td>
-                                <td><input type="number" name="apple" value="0" min="0" disabled="@(!ProductCheckedItems[product.Id])"></td>
-                                <td>g</td>
-                                <td>@product.Cost</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr class="table-light">
-                            <td colspan="4">Total Product Price:</td>
-                            <td>@TotalProductPrice</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
-
+        <GridColumns>
+            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false">
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" AllowEditing="false"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 
 
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Save</button>
@@ -114,17 +70,75 @@ else
     private IEnumerable<ComponentDTO> Components { get; set; } = new List<ComponentDTO>();
     private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
+    private List<string> Category = new List<string>() { "ingredient", "product" };
     private bool isLoading { get; set; } = true;
-    public Dictionary<int, bool> IngredientCheckedItems { get; set; } = new Dictionary<int, bool>();
-    public Dictionary<int, bool> ProductCheckedItems { get; set; } = new Dictionary<int, bool>();
+    private List<string> NameSource = new List<string>();
+    private SfGrid<ProductComponentDTO> GridRef;
+
+    private ProductComponentDTO component1 = new ProductComponentDTO
+    {
+        Id = 1,
+        ProductId = 1,
+        ComponentIngredientId = 1,
+        ComponentProductId = null,
+        Amount = 0.5,
+    };
+
+    private ProductComponentDTO component2 = new ProductComponentDTO
+    {
+        Id = 2,
+        ProductId = 1,
+        ComponentIngredientId = null,
+        ComponentProductId = 1,
+        Amount = 1.0
+    };
+
+    private ProductComponentDTO component3 = new ProductComponentDTO
+    {
+        Id = 3,
+        ProductId = 1,
+        ComponentIngredientId = 2,
+        ComponentProductId = null,
+        Amount = 1.5
+    };
+    private ProductComponentDTO component4 = new ProductComponentDTO
+    {
+        Id = 3,
+        ProductId = 1,
+        ComponentIngredientId = null,
+        ComponentProductId = 2,
+        Amount = 1.5
+    };
+    private ProductComponentDTO component5 = new ProductComponentDTO
+    {
+        Id = 3,
+        ProductId = 1,
+        ComponentIngredientId = 3,
+        ComponentProductId = null,
+        Amount = 1.5
+    };
+    private ProductComponentDTO component6 = new ProductComponentDTO
+    {
+        Id = 3,
+        ProductId = 1,
+        ComponentIngredientId = null,
+        ComponentProductId = 3,
+        Amount = 1.5
+    };
 
     [Inject]
-    UserManager<IdentityUser> userManager { get; set; }
+    UserManager<IdentityUser>
+    userManager
+    { get; set; }
     [CascadingParameter]
-    public Task<AuthenticationState> authenticationState { get; set; }
+    public Task<AuthenticationState>
+        authenticationState
+    { get; set; }
     private string authenticatedUserId;
 
-    private List<string> UnitsOfMeasure = new List<string>();
+    private List<string>
+        UnitsOfMeasure = new List<string>
+            ();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -146,32 +160,81 @@ else
                 UnitsOfMeasure = UtilitiesUoM.GetNameUoM();
             }
 
-            foreach (var component in Components)
-            {
-                IngredientCheckedItems.Add(component.ComponentId, false);
-            }
+        ((List<ProductComponentDTO>
+            )ProductComponents).Add(component1);
+            ((List<ProductComponentDTO>
+                )ProductComponents).Add(component2);
+            ((List<ProductComponentDTO>
+                )ProductComponents).Add(component3);
+            ((List<ProductComponentDTO>
+                )ProductComponents).Add(component4);
+            ((List<ProductComponentDTO>
+                )ProductComponents).Add(component5);
+            ((List<ProductComponentDTO>
+                )ProductComponents).Add(component6);
 
-            foreach (var product in Products)
+            foreach (var pc in ProductComponents)
             {
-                ProductCheckedItems.Add(product.Id, false);
+                GetProperty(pc);
             }
 
             StateHasChanged();
         }
-
     }
 
-    public double TotalIngredientPrice => Components.Where(i => IngredientCheckedItems[i.ComponentId]).Sum(i => i.Price);
-    public double TotalProductPrice => Products.Where(i => ProductCheckedItems[i.Id]).Sum(i => i.Cost);
+    private void GetProperty(ProductComponentDTO component)
+    {
+        component.ProductId = Id;
+        if (component.ComponentIngredientId != null)
+        {
+            var ingredient = Components.FirstOrDefault(c => c.ComponentId == component.ComponentIngredientId);
+            if (ingredient != null)
+            {
+                component.Name = ingredient.Name;
+                component.Category = "ingredient";
+            }
+        }
+        else if (component.ComponentProductId != null)
+        {
+            var product = Products.FirstOrDefault(p => p.Id == component.ComponentProductId);
+            if (product != null)
+            {
+                component.Name = product.Name;
+                component.Category = "product";
+            }
+        }
+        else
+        {
+            component.Name = "Not Found";
+            component.Category = "Not Found";
+        }
+        return;
+    }
+
+    private void OnCategoryChange(ChangeEventArgs<string, string> args)
+    {
+        NameSource = new List<string>();
+        if (args.Value == "ingredient")
+        {
+            foreach (var component in Components)
+            {
+                NameSource.Add(component.Name);
+            }
+        }
+        else
+        {
+            foreach (var product in Products)
+            {
+                NameSource.Add(product.Name);
+            }
+        }
+        GridRef.PreventRender(false);
+    }
 
     private async void Save(int id)
     {
         Product.Cost = 0;
         ProductComponents = await _ProductComponentRepository.GetAll(id);
-        //foreach (var component in ProductComponent)
-        //{
-        //    Product.Cost += (double)component.Price;
-        //}
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
     }
