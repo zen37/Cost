@@ -23,7 +23,7 @@ else
         </div>
     </div>
 
-    <SfGrid @ref="GridRef" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })">
+    <SfGrid @ref="GridRef" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel"})">
         <GridPageSettings PageSize="5"></GridPageSettings>
         <GridEvents OnActionBegin="OnActionBegin" TValue="ProductComponentDTO"></GridEvents>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
@@ -256,7 +256,6 @@ else
         }
         if (args.RequestType.Equals(Action.BeginEdit))
         {
-
             Console.WriteLine("edit");
             GetValidUoM(comp.Name);
             UpdateSelect();
