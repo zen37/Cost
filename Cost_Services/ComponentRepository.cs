@@ -30,7 +30,6 @@ namespace Cost_Services
             obj.CreatedBy = objDTO.UserId;
             obj.CreatedTimestamp = dt;
             obj.UpdatedBy = objDTO.UserId;
-            obj.BasePrice = objDTO.BasePrice;
             obj.UpdatedTimestamp = dt;
 
             var addedObj = _db.Components.Add(obj);
@@ -47,9 +46,8 @@ namespace Cost_Services
                 objFromDb.Name  = objDTO.Name;
                 objFromDb.Price = objDTO.Price;
                 objFromDb.UoM   = objDTO.UoM;
-                objFromDb.BasePrice = objDTO.BasePrice;
                 objFromDb.Other = objDTO.Other;
-
+                objFromDb.Wastage = objDTO.Wastage;
                 objFromDb.UpdatedBy         = objDTO.UserId;
                 objFromDb.UpdatedTimestamp  = DateTime.Now;
 

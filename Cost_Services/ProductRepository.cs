@@ -77,6 +77,7 @@ namespace Cost_Services
                 objFromDb.Name = objDTO.Name;
                 objFromDb.Other = objDTO.Other;
                 objFromDb.Cost= objDTO.Cost;
+                objFromDb.CostWastage = objDTO.CostWastage;
 
                 objFromDb.UpdatedBy = objDTO.UserId;
                 objFromDb.UpdatedTimestamp = DateTime.Now;

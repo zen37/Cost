@@ -21,6 +21,8 @@ namespace Cost_Models
         public string? Name { get; set; } 
         public string? Category { get; set; }
         public double FromPrice { get; set; } = 0;
+        public double FromPriceWastage { get; set; } = 0;
         public double Price { get; set; } = 0;
+        public double PriceWastage { get; set; } = 0;
     }
 }
