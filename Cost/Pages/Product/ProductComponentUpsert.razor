@@ -41,6 +41,7 @@ else
                             <div class="col">
                                 <label>Name</label>
                                 <SfDropDownList TValue="string" TItem="string" ID="Name" @bind-Value="@(PC.Name)" DataSource="@NameSource" Enabled="@((PC.Id == 0) ? true : false)">
+                                    <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
                                 </SfDropDownList>
                             </div>
                             <div class="col">
@@ -72,16 +73,28 @@ else
                             }
                         </FooterTemplate>
                     </GridAggregateColumn>
+                    <GridAggregateColumn Field=@nameof(ProductComponentDTO.PriceWastage) Type="AggregateType.Sum" Format="N2">
+                        <FooterTemplate>
+                            @{
+                                var aggregate = (context as AggregateTemplateContext);
+                                <div>
+                                    <p>Sum: @aggregate.Sum</p>
+                                </div>
+                                Product.CostWastage = double.Parse(@aggregate.Sum);
+                            }
+                        </FooterTemplate>
+                    </GridAggregateColumn>
                 </GridAggregateColumns>
             </GridAggregate>
         </GridAggregates>
 
         <GridColumns>
             <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" AllowEditing="false"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" AllowEditing="false" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
             <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowEditing="false" Format="N2"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowEditing="false" Format="N2"></GridColumn>
         </GridColumns>
     </SfGrid>
 
@@ -155,7 +168,9 @@ else
                 component.Category = "ingredient";
                 component.FromUoM = ingredient.UoM;
                 component.FromPrice = ingredient.Price;
+                component.FromPriceWastage = Math.Round(ingredient.Price * 100 / (100 - ingredient.Wastage), 2);
                 component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
+                component.PriceWastage = CalculatePrice(component.FromUoM, component.UoM, component.FromPriceWastage, component.Amount);
             }
         }
         else if (component.ComponentProductId != null)
@@ -167,7 +182,9 @@ else
                 component.Category = "product";
                 component.FromUoM = "each";
                 component.FromPrice = product.Cost;
+                component.FromPriceWastage = product.CostWastage;
                 component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
+                component.PriceWastage = CalculatePrice(component.FromUoM, component.UoM, component.FromPriceWastage, component.Amount);
             }
         }
         else
@@ -180,17 +197,20 @@ else
 
     private void OnCategoryChange(ChangeEventArgs<string, string> args)
     {
-        ValidUoM = new List<string>();
         if (args.Value == "ingredient")
         {
             NameSource = IngredientSelect;
-            GetValidUoM(new ProductComponentDTO { Category = "ingredient" });
         }
         else
         {
             NameSource = ProductSelect;
-            GetValidUoM(new ProductComponentDTO { Category = "product", UoM = "each" });
         }
+        GridRef.PreventRender(false);
+    }
+
+    private void OnNameChange(ChangeEventArgs<string, string> args)
+    {
+        GetValidUoM(args.Value);
         GridRef.PreventRender(false);
     }
 
@@ -199,6 +219,7 @@ else
         var comp = args.Data;
         if (args.RequestType.Equals(Action.Save))
         {
+            Console.WriteLine("save");
             comp.ProductId = Product.Id;
             if (comp.Id == 0)
             {
@@ -208,6 +229,8 @@ else
                     comp.ComponentIngredientId = c.ComponentId;
                     comp.FromUoM = c.UoM;
                     comp.FromPrice = c.Price;
+                    comp.FromPriceWastage = c.Price * 100 / (100 - c.Wastage);
+                    Console.WriteLine(comp.FromPriceWastage);
                 }
                 else
                 {
@@ -215,6 +238,7 @@ else
                     comp.ComponentProductId = p.Id;
                     comp.FromUoM = "each";
                     comp.FromPrice = p.Cost;
+                    comp.FromPriceWastage = p.CostWastage;
                 }
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
                 _ProductComponentRepository.Create(comp);
@@ -227,15 +251,19 @@ else
         }
         if (args.RequestType.Equals(Action.Add))
         {
-            GetValidUoM(comp);
+            Console.WriteLine("add");
+            ValidUoM.Clear();
         }
         if (args.RequestType.Equals(Action.BeginEdit))
         {
-            GetValidUoM(comp);
+
+            Console.WriteLine("edit");
+            GetValidUoM(comp.Name);
             UpdateSelect();
         }
         if (args.RequestType.Equals(Action.Delete))
         {
+            Console.WriteLine("delete");
             _ProductComponentRepository.Delete(comp.Id);
             UpdateSelect();
         }
@@ -254,23 +282,21 @@ else
         return ToFactor / FromFactor;
     }
 
-    private void GetValidUoM(ProductComponentDTO PC)
+    private void GetValidUoM(string Name)
     {
-        ValidUoM.Clear();
-        if ((PC.Id == 0 && PC.Category == "ingredient") || (PC.Id == 0 && PC.Category == null))
+        ValidUoM = new List<string>();
+        var UoM = "each";
+        var comp = Components.FirstOrDefault(x => x.Name == Name);
+        if (comp != null)
         {
-            ValidUoM = UnitsOfMeasure;
+            UoM = comp.UoM;
         }
-        else
+        List<UoM> SameCategory = UtilitiesUoM.GetListbyName(UoM);
+        foreach (var unit in SameCategory)
         {
-            List<UoM> SameCategory = UtilitiesUoM.GetListbyName(PC.UoM);
-            foreach (var unit in SameCategory)
-            {
-                ValidUoM.Add(unit.Name);
-            }
-            SameCategory.Clear();
+            ValidUoM.Add(unit.Name);
         }
-        return;
+        SameCategory.Clear();
     }
 
     private void UpdateSelect()

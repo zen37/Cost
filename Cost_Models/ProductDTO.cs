@@ -12,6 +12,7 @@ namespace Cost_Models
         [Required(ErrorMessage = "Please enter name..")]
         public string Name { get; set; }
         public double Cost { get; set; }
+        public double CostWastage { get; set; }
         public string? Other { get; set; }
 
         //[Required(ErrorMessage = "Please enter at least one ingredient..")]

@@ -30,6 +30,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Cost</th>
+                            <th>Cost(Wastage)</th>
                             <th>Other</th>
                             <th>Actions</th>
                         </tr>
@@ -40,6 +41,7 @@
                             <tr>
                                 <td>@product.Name</td>
                                 <td>@product.Cost</td>
+                                <td>@product.CostWastage</td>
                                 <td>@product.Other</td>
                                 <td>
                                     <NavLink href="@($"/product/edit/{product.Id}")" class="btn-primary btn">Edit</NavLink>
