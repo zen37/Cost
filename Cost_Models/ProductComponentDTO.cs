@@ -16,7 +16,11 @@ namespace Cost_Models
         public int? ComponentIngredientId { get; set; }
         public int? ComponentProductId { get; set; }
         public double Amount { get; set; }
+        public string? FromUoM { get; set; }
+        public string UoM { get; set; }
         public string? Name { get; set; } 
         public string? Category { get; set; }
+        public double FromPrice { get; set; } = 0;
+        public double Price { get; set; } = 0;
     }
 }

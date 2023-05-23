@@ -3,6 +3,7 @@
 @inject IProductRepository _productRepository
 @inject IProductComponentRepository _ProductComponentRepository
 @inject NavigationManager _nav
+@using Action = Syncfusion.Blazor.Grids.Action
 
 <h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
 @if (isLoading)
@@ -24,6 +25,7 @@ else
 
     <SfGrid @ref="GridRef" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })">
         <GridPageSettings PageSize="5"></GridPageSettings>
+        <GridEvents OnActionBegin="OnActionBegin" TValue="ProductComponentDTO"></GridEvents>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
             <Template>
                 @{
@@ -38,12 +40,17 @@ else
                             </div>
                             <div class="col">
                                 <label>Name</label>
-                                <SfDropDownList TValue="string" TItem="string" ID="Name" @bind-Value="@(PC.Name)" Enabled="@((PC.Id == 0) ? true : false)" DataSource="@NameSource">
+                                <SfDropDownList TValue="string" TItem="string" ID="Name" @bind-Value="@(PC.Name)" DataSource="@NameSource" Enabled="@((PC.Id == 0) ? true : false)">
                                 </SfDropDownList>
                             </div>
                             <div class="col">
                                 <label>Amount</label>
                                 <SfNumericTextBox ID="Amount" @bind-Value="@(PC.Amount)"></SfNumericTextBox>
+                            </div>
+                            <div class="col">
+                                <label>UoM</label>
+                                <SfDropDownList TValue="string" TItem="string" ID="UoM" @bind-Value="@(PC.UoM)" DataSource="@ValidUoM">
+                                </SfDropDownList>
                             </div>
                         </div>
                     </div>
@@ -51,11 +58,30 @@ else
             </Template>
         </GridEditSettings>
 
+        <GridAggregates>
+            <GridAggregate>
+                <GridAggregateColumns>
+                    <GridAggregateColumn Field=@nameof(ProductComponentDTO.Price) Type="AggregateType.Sum" Format="N2">
+                        <FooterTemplate>
+                            @{
+                                var aggregate = (context as AggregateTemplateContext);
+                                <div>
+                                    <p>Sum: @aggregate.Sum</p>
+                                </div>
+                                Product.Cost = double.Parse(@aggregate.Sum);
+                            }
+                        </FooterTemplate>
+                    </GridAggregateColumn>
+                </GridAggregateColumns>
+            </GridAggregate>
+        </GridAggregates>
+
         <GridColumns>
-            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false">
-            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false"></GridColumn>
             <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" AllowEditing="false"></GridColumn>
             <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowEditing="false" Format="N2"></GridColumn>
         </GridColumns>
     </SfGrid>
 
@@ -74,71 +100,19 @@ else
     private bool isLoading { get; set; } = true;
     private List<string> NameSource = new List<string>();
     private SfGrid<ProductComponentDTO> GridRef;
-
-    private ProductComponentDTO component1 = new ProductComponentDTO
-    {
-        Id = 1,
-        ProductId = 1,
-        ComponentIngredientId = 1,
-        ComponentProductId = null,
-        Amount = 0.5,
-    };
-
-    private ProductComponentDTO component2 = new ProductComponentDTO
-    {
-        Id = 2,
-        ProductId = 1,
-        ComponentIngredientId = null,
-        ComponentProductId = 1,
-        Amount = 1.0
-    };
-
-    private ProductComponentDTO component3 = new ProductComponentDTO
-    {
-        Id = 3,
-        ProductId = 1,
-        ComponentIngredientId = 2,
-        ComponentProductId = null,
-        Amount = 1.5
-    };
-    private ProductComponentDTO component4 = new ProductComponentDTO
-    {
-        Id = 3,
-        ProductId = 1,
-        ComponentIngredientId = null,
-        ComponentProductId = 2,
-        Amount = 1.5
-    };
-    private ProductComponentDTO component5 = new ProductComponentDTO
-    {
-        Id = 3,
-        ProductId = 1,
-        ComponentIngredientId = 3,
-        ComponentProductId = null,
-        Amount = 1.5
-    };
-    private ProductComponentDTO component6 = new ProductComponentDTO
-    {
-        Id = 3,
-        ProductId = 1,
-        ComponentIngredientId = null,
-        ComponentProductId = 3,
-        Amount = 1.5
-    };
+    private List<string> ValidUoM = new List<string>();
+    private List<string> ProductSelect = new List<string>();
+    private List<string> IngredientSelect = new List<string>();
 
     [Inject]
     UserManager<IdentityUser>
     userManager
     { get; set; }
     [CascadingParameter]
-    public Task<AuthenticationState>
-        authenticationState
-    { get; set; }
+    public Task<AuthenticationState> authenticationState { get; set; }
     private string authenticatedUserId;
 
-    private List<string>
-        UnitsOfMeasure = new List<string>
-            ();
+    private List<string> UnitsOfMeasure = new List<string>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -160,24 +134,11 @@ else
                 UnitsOfMeasure = UtilitiesUoM.GetNameUoM();
             }
 
-        ((List<ProductComponentDTO>
-            )ProductComponents).Add(component1);
-            ((List<ProductComponentDTO>
-                )ProductComponents).Add(component2);
-            ((List<ProductComponentDTO>
-                )ProductComponents).Add(component3);
-            ((List<ProductComponentDTO>
-                )ProductComponents).Add(component4);
-            ((List<ProductComponentDTO>
-                )ProductComponents).Add(component5);
-            ((List<ProductComponentDTO>
-                )ProductComponents).Add(component6);
-
             foreach (var pc in ProductComponents)
             {
                 GetProperty(pc);
             }
-
+            UpdateSelect();
             StateHasChanged();
         }
     }
@@ -192,6 +153,9 @@ else
             {
                 component.Name = ingredient.Name;
                 component.Category = "ingredient";
+                component.FromUoM = ingredient.UoM;
+                component.FromPrice = ingredient.Price;
+                component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
             }
         }
         else if (component.ComponentProductId != null)
@@ -201,6 +165,9 @@ else
             {
                 component.Name = product.Name;
                 component.Category = "product";
+                component.FromUoM = "each";
+                component.FromPrice = product.Cost;
+                component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
             }
         }
         else
@@ -213,28 +180,107 @@ else
 
     private void OnCategoryChange(ChangeEventArgs<string, string> args)
     {
-        NameSource = new List<string>();
+        ValidUoM = new List<string>();
         if (args.Value == "ingredient")
         {
-            foreach (var component in Components)
-            {
-                NameSource.Add(component.Name);
-            }
+            NameSource = IngredientSelect;
+            GetValidUoM(new ProductComponentDTO { Category = "ingredient" });
         }
         else
         {
-            foreach (var product in Products)
-            {
-                NameSource.Add(product.Name);
-            }
+            NameSource = ProductSelect;
+            GetValidUoM(new ProductComponentDTO { Category = "product", UoM = "each" });
         }
         GridRef.PreventRender(false);
     }
 
+    public void OnActionBegin(ActionEventArgs<ProductComponentDTO> args)
+    {
+        var comp = args.Data;
+        if (args.RequestType.Equals(Action.Save))
+        {
+            comp.ProductId = Product.Id;
+            if (comp.Id == 0)
+            {
+                if (comp.Category == "ingredient")
+                {
+                    var c = Components.FirstOrDefault(x => x.Name == comp.Name);
+                    comp.ComponentIngredientId = c.ComponentId;
+                    comp.FromUoM = c.UoM;
+                    comp.FromPrice = c.Price;
+                }
+                else
+                {
+                    var p = Products.FirstOrDefault(x => x.Name == comp.Name);
+                    comp.ComponentProductId = p.Id;
+                    comp.FromUoM = "each";
+                    comp.FromPrice = p.Cost;
+                }
+                comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
+                _ProductComponentRepository.Create(comp);
+            }
+            else
+            {
+                comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
+                _ProductComponentRepository.Update(comp);
+            }
+        }
+        if (args.RequestType.Equals(Action.Add))
+        {
+            GetValidUoM(comp);
+        }
+        if (args.RequestType.Equals(Action.BeginEdit))
+        {
+            GetValidUoM(comp);
+            UpdateSelect();
+        }
+        if (args.RequestType.Equals(Action.Delete))
+        {
+            _ProductComponentRepository.Delete(comp.Id);
+            UpdateSelect();
+        }
+    }
+
+    private double CalculatePrice(string FromUoM, string ToUoM, double FromUoMPrice, double Amount)
+    {
+        double Factor = UnitConverter(FromUoM, ToUoM);
+        return FromUoMPrice * Factor * Amount;
+    }
+
+    private double UnitConverter(string FromUoM, string ToUoM)
+    {
+        double FromFactor = UtilitiesUoM.GetFactorbyUoMName(FromUoM);
+        double ToFactor = UtilitiesUoM.GetFactorbyUoMName(ToUoM);
+        return ToFactor / FromFactor;
+    }
+
+    private void GetValidUoM(ProductComponentDTO PC)
+    {
+        ValidUoM.Clear();
+        if ((PC.Id == 0 && PC.Category == "ingredient") || (PC.Id == 0 && PC.Category == null))
+        {
+            ValidUoM = UnitsOfMeasure;
+        }
+        else
+        {
+            List<UoM> SameCategory = UtilitiesUoM.GetListbyName(PC.UoM);
+            foreach (var unit in SameCategory)
+            {
+                ValidUoM.Add(unit.Name);
+            }
+            SameCategory.Clear();
+        }
+        return;
+    }
+
+    private void UpdateSelect()
+    {
+        ProductSelect = Products.Where(p => !ProductComponents.Any(c => c.ComponentProductId == p.Id || c.ProductId == p.Id)).Select(p => p.Name).ToList();
+        IngredientSelect = Components.Where(p => !ProductComponents.Any(c => c.ComponentIngredientId == p.ComponentId)).Select(p => p.Name).ToList();
+    }
+
     private async void Save(int id)
     {
-        Product.Cost = 0;
-        ProductComponents = await _ProductComponentRepository.GetAll(id);
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
     }

@@ -82,6 +82,7 @@ namespace Cost_Services.Repository
                     objFromDb.ComponentIngredientId = objDTO.ComponentIngredientId;
                     objFromDb.ComponentProductId = objDTO.ComponentProductId;
                     objFromDb.Amount = objDTO.Amount;
+                    objFromDb.UoM = objDTO.UoM;
                 }
                 await _db.SaveChangesAsync();
             }
