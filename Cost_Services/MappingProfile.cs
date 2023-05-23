@@ -18,7 +18,7 @@ namespace Cost_Services
             CreateMap<Component, ComponentDTO>().ReverseMap();
             CreateMap<Product, ProductDTO>().ReverseMap();
             CreateMap<Category, CategoryDTO>().ReverseMap();
-            CreateMap<ProductPrice, ProductPriceDTO>().ReverseMap();
+            CreateMap<ProductComponent, ProductComponentDTO>().ReverseMap();
 
         }
     }

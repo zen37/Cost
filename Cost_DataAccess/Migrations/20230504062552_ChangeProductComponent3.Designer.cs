@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CostDataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230109115921_UpdateDatabase")]
-    partial class UpdateDatabase
+    [Migration("20230504062552_ChangeProductComponent3")]
+    partial class ChangeProductComponent3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,6 +105,9 @@ namespace CostDataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<double>("Wastage")
+                        .HasColumnType("float");
+
                     b.HasKey("ComponentId");
 
                     b.HasIndex("UserId");
@@ -141,7 +144,6 @@ namespace CostDataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Other")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -173,24 +175,16 @@ namespace CostDataAccess.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<int>("ComponentId")
+                    b.Property<int>("ComponentIngredientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ComponentUoM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ComponentProductId")
+                        .HasColumnType("int");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ComponentId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductComponent");
                 });
@@ -419,23 +413,6 @@ namespace CostDataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Cost_DataAccess.ProductComponent", b =>
-                {
-                    b.HasOne("Cost_DataAccess.Component", "Component")
-                        .WithMany("ProductComponent")
-                        .HasForeignKey("ComponentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Cost_DataAccess.Product", "Product")
-                        .WithMany("ProductComponent")
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Component");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -485,16 +462,6 @@ namespace CostDataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Cost_DataAccess.Component", b =>
-                {
-                    b.Navigation("ProductComponent");
-                });
-
-            modelBuilder.Entity("Cost_DataAccess.Product", b =>
-                {
-                    b.Navigation("ProductComponent");
                 });
 #pragma warning restore 612, 618
         }

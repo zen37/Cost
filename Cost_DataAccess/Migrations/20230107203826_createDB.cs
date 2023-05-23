@@ -231,7 +231,7 @@ namespace CostDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductPrices",
+                name: "ProductComponent",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -243,15 +243,15 @@ namespace CostDataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductPrices", x => x.Id);
+                    table.PrimaryKey("PK_ProductComponent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductPrices_Components_ComponentId",
+                        name: "FK_ProductComponent_Components_ComponentId",
                         column: x => x.ComponentId,
                         principalTable: "Components",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductPrices_Products_ProductId",
+                        name: "FK_ProductComponent_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id");
@@ -302,13 +302,13 @@ namespace CostDataAccess.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductPrices_ComponentId",
-                table: "ProductPrices",
+                name: "IX_ProductComponent_ComponentId",
+                table: "ProductComponent",
                 column: "ComponentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductPrices_ProductId",
-                table: "ProductPrices",
+                name: "IX_ProductComponent_ProductId",
+                table: "ProductComponent",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -339,7 +339,7 @@ namespace CostDataAccess.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "ProductPrices");
+                name: "ProductComponent");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CostDataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230109115921_UpdateDatabase")]
-    partial class UpdateDatabase
+    [Migration("20230426222427_Wastage")]
+    partial class Wastage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,6 +105,9 @@ namespace CostDataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<double>("Wastage")
+                        .HasColumnType("float");
+
                     b.HasKey("ComponentId");
 
                     b.HasIndex("UserId");
@@ -141,7 +144,6 @@ namespace CostDataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Other")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")

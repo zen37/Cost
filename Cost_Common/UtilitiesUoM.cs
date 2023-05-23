@@ -70,7 +70,26 @@ namespace Cost_Common
             {
                 foreach (UoM unit in lstUoM)
                 {
-                    lstClass.Add(unit);
+                    if (unit.Class == cls)
+                    {
+                        lstClass.Add(unit);
+                    }
+                }
+            }
+            return lstClass;
+        }
+
+        public static List<UoM> GetListbyName(string name)
+        {
+            var cls = GetClassbyName(name);
+            if (!lstClass.Any())
+            {
+                foreach (UoM unit in lstUoM)
+                {
+                    if (unit.Class == cls)
+                    {
+                        lstClass.Add(unit);
+                    }
                 }
             }
             return lstClass;
@@ -83,6 +102,18 @@ namespace Cost_Common
                 if (abbreviation == unit.Abbreviation)
                 {
                     className= unit.Class;
+                }
+            }
+            return className;
+        }
+
+        public static string GetClassbyName(string name)
+        {
+            foreach (UoM unit in lstUoM)
+            {
+                if (name == unit.Name)
+                {
+                    className = unit.Class;
                 }
             }
             return className;

@@ -5,20 +5,13 @@
 namespace CostDataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDatabase : Migration
+    public partial class Wastage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<double>(
-                name: "Price",
-                table: "ProductComponent",
-                type: "float",
-                nullable: false,
-                defaultValue: 0.0);
-
-            migrationBuilder.AddColumn<double>(
-                name: "BasePrice",
+                name: "Wastage",
                 table: "Components",
                 type: "float",
                 nullable: false,
@@ -29,11 +22,7 @@ namespace CostDataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Price",
-                table: "ProductComponent");
-
-            migrationBuilder.DropColumn(
-                name: "BasePrice",
+                name: "Wastage",
                 table: "Components");
         }
     }
