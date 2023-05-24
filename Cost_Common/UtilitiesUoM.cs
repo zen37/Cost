@@ -65,6 +65,7 @@ namespace Cost_Common
 
         public static List<UoM> GetListbyAbbreviation(string abbreviation)
         {
+            lstClass.Clear();
             var cls = GetClassbyAbbreviation(abbreviation);
             if (!lstClass.Any())
             {
@@ -81,6 +82,7 @@ namespace Cost_Common
 
         public static List<UoM> GetListbyName(string name)
         {
+            lstClass.Clear();
             var cls = GetClassbyName(name);
             if (!lstClass.Any())
             {
