@@ -23,7 +23,7 @@ else
         </div>
     </div>
 
-    <SfGrid DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
+    <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
         <GridPageSettings PageSize="5"></GridPageSettings>
         <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductComponentDTO"></GridEvents>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal">
@@ -86,7 +86,6 @@ else
         </GridColumns>
     </SfGrid>
 
-
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Save</button>
 }
 
@@ -104,10 +103,11 @@ else
     private IEnumerable<string> SameCategory = new List<string>();
     private IEnumerable<string> ProductSelect = new List<string>();
     private IEnumerable<string> IngredientSelect = new List<string>();
+    SfGrid<ProductComponentDTO> Grid { get; set; }
 
     [Inject]
     UserManager<IdentityUser>
-    userManager
+userManager
     { get; set; }
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
@@ -216,7 +216,6 @@ else
                     comp.FromUoM = c.UoM;
                     comp.FromPrice = c.Price;
                     comp.FromPriceWastage = c.Price * 100 / (100 - c.Wastage);
-                    Console.WriteLine(comp.FromPriceWastage);
                 }
                 else
                 {
@@ -227,23 +226,21 @@ else
                     comp.FromPriceWastage = p.CostWastage;
                 }
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPriceWastage, comp.Amount);
                 await _ProductComponentRepository.Create(comp);
             }
             else
             {
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPriceWastage, comp.Amount);
                 await _ProductComponentRepository.Update(comp);
-            }
-            ProductComponents = await _ProductComponentRepository.GetAll(Id);
-            foreach (var pc in ProductComponents)
-            {
-                GetProperty(pc);
             }
         }
         if (args.RequestType.Equals(Action.Add))
         {
             Console.WriteLine("add");
             ValidUoM = new List<string>();
+            UpdateSelect();
         }
         if (args.RequestType.Equals(Action.BeginEdit))
         {
@@ -255,15 +252,28 @@ else
             Console.WriteLine("delete");
             await _ProductComponentRepository.Delete(comp.Id);
             ProductComponents = await _ProductComponentRepository.GetAll(Id);
+            foreach (var pc in ProductComponents)
+            {
+                GetProperty(pc);
+            }
             UpdateSelect();
         }
     }
 
-    public void OnActionComplete(ActionEventArgs<ProductComponentDTO> args)
+    public async Task OnActionComplete(ActionEventArgs<ProductComponentDTO> args)
     {
         if (args.RequestType.ToString() == "Add" || args.RequestType.ToString() == "BeginEdit")
         {
             args.PreventRender = false;
+        }
+        if (args.RequestType.ToString() == "Save")
+        {
+            ProductComponents = await _ProductComponentRepository.GetAll(Id);
+            foreach (var pc in ProductComponents)
+            {
+                GetProperty(pc);
+            }
+            await Grid.Refresh();
         }
     }
 
@@ -303,4 +313,4 @@ else
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
     }
-    }
+}
