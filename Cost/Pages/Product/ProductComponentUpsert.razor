@@ -23,40 +23,10 @@ else
         </div>
     </div>
 
-    <SfGrid @ref="GridRef" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })">
+    <SfGrid DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
         <GridPageSettings PageSize="5"></GridPageSettings>
-        <GridEvents OnActionBegin="OnActionBegin" TValue="ProductComponentDTO"></GridEvents>
-        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
-            <Template>
-                @{
-                    var PC = (context as ProductComponentDTO);
-                    <div>
-                        <div class="form-row">
-                            <div class="col">
-                                <label>Category</label>
-                                <SfDropDownList TValue="string" TItem="string" @bind-Value="@PC.Category" DataSource="@Category" Enabled="@((PC.Id == 0) ? true : false)">
-                                    <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
-                                </SfDropDownList>
-                            </div>
-                            <div class="col">
-                                <label>Name</label>
-                                <SfDropDownList TValue="string" TItem="string" ID="Name" @bind-Value="@(PC.Name)" DataSource="@NameSource" Enabled="@((PC.Id == 0) ? true : false)">
-                                    <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
-                                </SfDropDownList>
-                            </div>
-                            <div class="col">
-                                <label>Amount</label>
-                                <SfNumericTextBox ID="Amount" @bind-Value="@(PC.Amount)"></SfNumericTextBox>
-                            </div>
-                            <div class="col">
-                                <label>UoM</label>
-                                <SfDropDownList TValue="string" TItem="string" ID="UoM" @bind-Value="@(PC.UoM)" DataSource="@ValidUoM">
-                                </SfDropDownList>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </Template>
+        <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductComponentDTO"></GridEvents>
+        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal">
         </GridEditSettings>
 
         <GridAggregates>
@@ -89,12 +59,30 @@ else
         </GridAggregates>
 
         <GridColumns>
-            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" AllowEditing="false" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" ValidationRules="@(new ValidationRules{ Required= true })"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowEditing="false" Format="N2"></GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowEditing="false" Format="N2"></GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" EditType="EditType.DropDownEdit" AllowEditing="false">
+                <EditTemplate>
+                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).Category" TValue="string" TItem="string" DataSource="@Category" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
+                        <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" EditType="EditType.DropDownEdit" AllowEditing="false">
+                <EditTemplate>
+                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).Name" TValue="string" TItem="string" ID="Name" DataSource="@NameSource" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
+                        <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })">
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit">
+                <EditTemplate>
+                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@ValidUoM"></SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowAdding="false" AllowEditing="false" Format="N2">
+            </GridColumn>
+            <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowAdding="false" AllowEditing="false" Format="N2"></GridColumn>
         </GridColumns>
     </SfGrid>
 
@@ -109,13 +97,13 @@ else
     private IEnumerable<ComponentDTO> Components { get; set; } = new List<ComponentDTO>();
     private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
-    private List<string> Category = new List<string>() { "ingredient", "product" };
+    private IEnumerable<string> Category = new List<string>() { "ingredient", "product" };
     private bool isLoading { get; set; } = true;
-    private List<string> NameSource = new List<string>();
-    private SfGrid<ProductComponentDTO> GridRef;
-    private List<string> ValidUoM = new List<string>();
-    private List<string> ProductSelect = new List<string>();
-    private List<string> IngredientSelect = new List<string>();
+    private IEnumerable<string> NameSource = new List<string>();
+    private IEnumerable<string> ValidUoM = new List<string>();
+    private IEnumerable<string> SameCategory = new List<string>();
+    private IEnumerable<string> ProductSelect = new List<string>();
+    private IEnumerable<string> IngredientSelect = new List<string>();
 
     [Inject]
     UserManager<IdentityUser>
@@ -205,16 +193,14 @@ else
         {
             NameSource = ProductSelect;
         }
-        GridRef.PreventRender(false);
     }
 
     private void OnNameChange(ChangeEventArgs<string, string> args)
     {
         GetValidUoM(args.Value);
-        GridRef.PreventRender(false);
     }
 
-    public void OnActionBegin(ActionEventArgs<ProductComponentDTO> args)
+    public async Task OnActionBegin(ActionEventArgs<ProductComponentDTO> args)
     {
         var comp = args.Data;
         if (args.RequestType.Equals(Action.Save))
@@ -241,31 +227,43 @@ else
                     comp.FromPriceWastage = p.CostWastage;
                 }
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
-                _ProductComponentRepository.Create(comp);
+                await _ProductComponentRepository.Create(comp);
             }
             else
             {
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
-                _ProductComponentRepository.Update(comp);
+                await _ProductComponentRepository.Update(comp);
+            }
+            ProductComponents = await _ProductComponentRepository.GetAll(Id);
+            foreach (var pc in ProductComponents)
+            {
+                GetProperty(pc);
             }
         }
         if (args.RequestType.Equals(Action.Add))
         {
             Console.WriteLine("add");
-            ValidUoM.Clear();
+            ValidUoM = new List<string>();
         }
         if (args.RequestType.Equals(Action.BeginEdit))
         {
-
             Console.WriteLine("edit");
             GetValidUoM(comp.Name);
-            UpdateSelect();
         }
         if (args.RequestType.Equals(Action.Delete))
         {
             Console.WriteLine("delete");
-            _ProductComponentRepository.Delete(comp.Id);
+            await _ProductComponentRepository.Delete(comp.Id);
+            ProductComponents = await _ProductComponentRepository.GetAll(Id);
             UpdateSelect();
+        }
+    }
+
+    public void OnActionComplete(ActionEventArgs<ProductComponentDTO> args)
+    {
+        if (args.RequestType.ToString() == "Add" || args.RequestType.ToString() == "BeginEdit")
+        {
+            args.PreventRender = false;
         }
     }
 
@@ -284,19 +282,14 @@ else
 
     private void GetValidUoM(string Name)
     {
-        ValidUoM = new List<string>();
-        var UoM = "each";
+        ValidUoM = new List<string>() { "each" };
         var comp = Components.FirstOrDefault(x => x.Name == Name);
         if (comp != null)
         {
-            UoM = comp.UoM;
+            var UoM = comp.UoM;
+            IEnumerable<UoM> SameCategory = UtilitiesUoM.GetListbyName(UoM);
+            ValidUoM = SameCategory.Select(uom => uom.Name);
         }
-        List<UoM> SameCategory = UtilitiesUoM.GetListbyName(UoM);
-        foreach (var unit in SameCategory)
-        {
-            ValidUoM.Add(unit.Name);
-        }
-        SameCategory.Clear();
     }
 
     private void UpdateSelect()
@@ -310,4 +303,4 @@ else
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
     }
-}
+    }
