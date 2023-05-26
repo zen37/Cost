@@ -52,13 +52,14 @@
             <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
                 <GridPageSettings PageSize="10"></GridPageSettings>
                 <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ComponentDTO"></GridEvents>
-                <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+                <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                 <GridColumns>
                     <GridColumn Field=@nameof(ComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true"></GridColumn>
                     <GridColumn Field=@nameof(ComponentDTO.Price) HeaderText="Price" Format="C2"></GridColumn>
                     <GridColumn Field=@nameof(ComponentDTO.Wastage) HeaderText="Wastage" Format="N2"></GridColumn>
                     <GridColumn Field=@nameof(ComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit">
                         <EditTemplate Context="ctx">
+                            <label>UoM</label>
                             <SfDropDownList @bind-Value="(ctx as ComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@UnitsOfMeasure"></SfDropDownList>
                         </EditTemplate>
                     </GridColumn>
