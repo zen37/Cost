@@ -64,20 +64,14 @@
 
     [Parameter]
     public int Id { get; set; }
-
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
-
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
-
     private string authenticatedUserId;
-
     private bool IsLoading { get; set; }
     private string Title { get; set; } = "Create";
-
     private ComponentDTO Component { get; set; } = new ComponentDTO();
-
     private List<string> UnitsOfMeasure = new List<string>();
 
     protected override async Task OnInitializedAsync()
