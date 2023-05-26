@@ -26,8 +26,7 @@ else
     <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
         <GridPageSettings PageSize="5"></GridPageSettings>
         <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductComponentDTO"></GridEvents>
-        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal">
-        </GridEditSettings>
+        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
 
         <GridAggregates>
             <GridAggregate>
