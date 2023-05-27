@@ -1,14 +1,12 @@
 ﻿@page "/components"
 
 @inject IComponentRepository _component
-@inject IJSRuntime _jsRuntime
-
+@inject IProductComponentRepository _ProductComponentRepository
 @attribute [Authorize]
 
 <PageTitle>Ingredients</PageTitle>
 <AuthorizeView>
     <Authorized>
-        @*<_DeleteConfirmation ConfirmationChanged="ConfirmDelete_Click"></_DeleteConfirmation>*@
         <h1>Ingredients</h1>
 
         @if (components == null)
@@ -17,37 +15,10 @@
         }
         else
         {
-            @*<table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Unit of Measure</th>
-                        <th>Wastage</th>
-                        <th>Other</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var component in components)
-                    {
-                        <tr>
-                            <td>@component.Name</td>
-                            <td>@component.Price</td>
-                            <td>@component.UoM</td>
-                            <td>@component.Wastage</td>
-                            <td>@component.Other</td>
-                            <td>
-                                <NavLink href="@($"/component/edit/{component.ComponentId}")" class="btn-success btn">Edit</NavLink>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger" @onclick="()=>Delete(component.ComponentId)">Delete</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>*@
+            <SfToast ID="toast_default" @ref="ToastObj" Title="CANNOT DELETE THIS INGREDIENT" Content="@ToastContent"
+                     ShowCloseButton="true" NewestOnTop="true" ShowProgressBar="true">
+                <ToastPosition X="Center"></ToastPosition>
+            </SfToast>
 
             <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
                 <GridPageSettings PageSize="10"></GridPageSettings>
@@ -83,7 +54,6 @@
 </AuthorizeView>
 
 @code {
-
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
     [CascadingParameter]
@@ -92,7 +62,9 @@
     public bool isLoading { get; set; } = true;
     private int DeleteComponentId { get; set; } = 0;
     private IEnumerable<ComponentDTO> components { get; set; } = new List<ComponentDTO>();
+    private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     private SfGrid<ComponentDTO> Grid { get; set; }
+    private SfToast ToastObj;
     static List<string> UnitsOfMeasure = new List<string>();
 
 
@@ -109,6 +81,7 @@
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
             components = await _component.GetAll(authenticatedUserId);
+            ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId);
         }
         if (!UnitsOfMeasure.Any())
         {
@@ -116,23 +89,6 @@
         }
         isLoading = false;
     }
-
-    //private void Delete(int id)
-    //{
-    //    DeleteComponentId = id;
-    //    _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
-    //}
-
-    //public async Task ConfirmDelete_Click(bool isConfirmed)
-    //{
-    //    if (isConfirmed && DeleteComponentId != 0)
-    //    {
-    //        // delete
-    //        await _component.Delete(DeleteComponentId);
-    //        await LoadComponents();
-    //        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
-    //    }
-    //}
 
     public async Task OnActionBegin(ActionEventArgs<ComponentDTO> args)
     {
@@ -153,8 +109,17 @@
         if (args.RequestType.ToString() == "Delete")
         {
             Console.WriteLine("delete");
-            await _component.Delete(args.Data.ComponentId);
-            components = await _component.GetAll(authenticatedUserId);
+            var DeleteProductComponent = ProductComponents.FirstOrDefault(p => p.ComponentIngredientId == args.Data.ComponentId);
+            if (DeleteProductComponent != null)
+            {
+                args.Cancel = true;
+                ShowToast();
+            }
+            else
+            {
+                await _component.Delete(args.Data.ComponentId);
+                components = await _component.GetAll(authenticatedUserId);
+            }
         }
     }
 
@@ -169,6 +134,12 @@
             components = await _component.GetAll(authenticatedUserId);
             await Grid.Refresh();
         }
+    }
+
+    private string ToastContent = "<div>Please delete after removing from recepe.</div>";
+    private async Task ShowToast()
+    {
+        await this.ToastObj.ShowAsync();
     }
 }
 

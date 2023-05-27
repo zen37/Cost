@@ -58,12 +58,19 @@ namespace Cost_Services.Repository
             return new ProductComponentDTO();
         }
 
-        public async Task<IEnumerable<ProductComponentDTO>> GetAll(int? id = null)
+        public async Task<IEnumerable<ProductComponentDTO>> GetAll(string userId, int? id = null)
         {
+            IEnumerable<ProductComponent> UserProductComponents = new List<ProductComponent>();
+            if (userId != null && userId != "")
+            {
+                UserProductComponents = _db.ProductComponent.Where(x => x.UserId == userId);
+            }
+            else { throw new NotImplementedException(); }
+
             if (id != null && id > 0)
             {
                 return _mapper.Map<IEnumerable<ProductComponent>, IEnumerable<ProductComponentDTO>>
-                    (_db.ProductComponent.Where(u => u.ProductId == id));
+                    (UserProductComponents.Where(u => u.ProductId == id));
             }
             else
             {

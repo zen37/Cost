@@ -103,15 +103,11 @@ else
     private IEnumerable<string> ProductSelect = new List<string>();
     private IEnumerable<string> IngredientSelect = new List<string>();
     SfGrid<ProductComponentDTO> Grid { get; set; }
-
     [Inject]
-    UserManager<IdentityUser>
-userManager
-    { get; set; }
+    UserManager<IdentityUser> userManager { get; set; }
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
     private string authenticatedUserId;
-
     private List<string> UnitsOfMeasure = new List<string>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -121,12 +117,15 @@ userManager
         {
             isLoading = true;
             StateHasChanged();
+            if (user.Identity.IsAuthenticated)
+            {
+                var authenticatedUser = await userManager.GetUserAsync(user);
+                authenticatedUserId = authenticatedUser.Id;
+                ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
+                Components = await _componentRepository.GetAll(authenticatedUserId);
+                Products = await _productRepository.GetAll(authenticatedUserId);
+            }
             Product = await _productRepository.Get(Id);
-            ProductComponents = await _ProductComponentRepository.GetAll(Id);
-            var authenticatedUser = await userManager.GetUserAsync(user);
-            authenticatedUserId = authenticatedUser.Id;
-            Components = await _componentRepository.GetAll(authenticatedUserId);
-            Products = await _productRepository.GetAll(authenticatedUserId);
             isLoading = false;
 
             if (!UnitsOfMeasure.Any())
@@ -215,6 +214,7 @@ userManager
                     comp.FromUoM = c.UoM;
                     comp.FromPrice = c.Price;
                     comp.FromPriceWastage = c.Price * 100 / (100 - c.Wastage);
+                    comp.UserId = authenticatedUserId;
                 }
                 else
                 {
@@ -223,6 +223,7 @@ userManager
                     comp.FromUoM = "each";
                     comp.FromPrice = p.Cost;
                     comp.FromPriceWastage = p.CostWastage;
+                    comp.UserId = authenticatedUserId;
                 }
                 comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
                 comp.PriceWastage = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPriceWastage, comp.Amount);
@@ -250,7 +251,7 @@ userManager
         {
             Console.WriteLine("delete");
             await _ProductComponentRepository.Delete(comp.Id);
-            ProductComponents = await _ProductComponentRepository.GetAll(Id);
+            ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
             foreach (var pc in ProductComponents)
             {
                 GetProperty(pc);
@@ -267,7 +268,7 @@ userManager
         }
         if (args.RequestType.ToString() == "Save")
         {
-            ProductComponents = await _ProductComponentRepository.GetAll(Id);
+            ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
             foreach (var pc in ProductComponents)
             {
                 GetProperty(pc);

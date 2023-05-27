@@ -11,6 +11,7 @@ namespace Cost_DataAccess
     public class ProductComponent
     {
         public int Id { get; set; }
+        public string UserId { get; set; }
         public int ProductId { get; set; }
         public int? ComponentIngredientId { get; set; }
         public int? ComponentProductId { get; set; }

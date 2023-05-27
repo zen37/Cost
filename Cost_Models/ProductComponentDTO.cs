@@ -12,6 +12,7 @@ namespace Cost_Models
     public class ProductComponentDTO
     {
         public int Id { get; set; }
+        public string UserId { get; set; }
         public int ProductId { get; set; }
         public int? ComponentIngredientId { get; set; }
         public int? ComponentProductId { get; set; }
