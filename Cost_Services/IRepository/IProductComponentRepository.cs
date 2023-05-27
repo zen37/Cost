@@ -8,6 +8,6 @@ namespace Cost_Services.IRepository
         public Task<ProductComponentDTO> Update(ProductComponentDTO objDTO);
         public Task<int> Delete(int id);
         public Task<ProductComponentDTO> Get(int id);
-        public Task<IEnumerable<ProductComponentDTO>> GetAll(int? id=null);
+        public Task<IEnumerable<ProductComponentDTO>> GetAll(string userId, int? id=null);
     }
 }

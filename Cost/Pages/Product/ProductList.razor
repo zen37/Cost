@@ -1,22 +1,18 @@
 ﻿@page "/products"
 
 @inject IProductRepository _product
-@inject IJSRuntime _jsRuntime
 @inject NavigationManager _nav
+@inject IProductComponentRepository _ProductComponentRepository
 
 @attribute [Authorize]
 
 <PageTitle>Product</PageTitle>
 <AuthorizeView>
     <Authorized>
-        @*<_DeleteConfirmation ConfirmationChanged="ConfirmDelete_Click"></_DeleteConfirmation>*@
         <div class="row mt-4 p-3">
             <div class="col-6">
                 <h4 class="card-title text-primary">Product List</h4>
             </div>
-            @*<div class="col-4 offset-2">
-                    <a href="product/create" class="btn btn-primary form-control">Add New Product</a>
-                </div>*@
         </div>
 
         @if (products == null)
@@ -25,35 +21,10 @@
         }
         else
         {
-            @*<div class="col-12 p-3">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Cost</th>
-                                <th>Cost(Wastage)</th>
-                                <th>Other</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var product in products)
-                            {
-                                <tr>
-                                    <td>@product.Name</td>
-                                    <td>@product.Cost</td>
-                                    <td>@product.CostWastage</td>
-                                    <td>@product.Other</td>
-                                    <td>
-                                        <NavLink href="@($"/product/edit/{product.Id}")" class="btn-primary btn">Edit</NavLink>
-                                        <NavLink href="@($"/product/price/{product.Id}")" class="btn-success btn">Ingredients</NavLink>
-                                        <button class="btn btn-danger" @onclick="()=>Delete(product.Id)">Delete</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>*@
+            <SfToast ID="toast_default" @ref="ToastObj" Title="CANNOT DELETE THIS PRODUCT" Content="@ToastContent"
+                     ShowCloseButton="true" NewestOnTop="true" ShowProgressBar="true">
+                <ToastPosition X="Center"></ToastPosition>
+            </SfToast>
 
             <SfGrid @ref="Grid" DataSource="@products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
                 <GridPageSettings PageSize="10"></GridPageSettings>
@@ -66,10 +37,6 @@
                     <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
                     <GridColumn HeaderText="Manage Records">
                         <GridCommandColumns>
-                            @*<GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>*@
                             <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { Content = "Details", CssClass = "e-flat" })"></GridCommandColumn>
                         </GridCommandColumns>
                     </GridColumn>
@@ -85,24 +52,17 @@
 
 @code {
 
-    [Inject]
-    UserManager<IdentityUser> userManager { get; set; }
-    [CascadingParameter]
-    public Task<AuthenticationState> authenticationState { get; set; }
-    private string authenticatedUserId;
-    private SfGrid<ProductDTO> Grid { get; set; }
+        [Inject]
+        UserManager<IdentityUser>? userManager { get; set; }
+        [CascadingParameter]
+        public Task<AuthenticationState>? authenticationState { get; set; }
+    private string? authenticatedUserId;
+    private SfGrid<ProductDTO>? Grid { get; set; }
     private IEnumerable<ProductDTO> products { get; set; } = new List<ProductDTO>();
-    private IEnumerable<ProductComponentDTO> ProductComponent { get; set; } = new List<ProductComponentDTO>();
+    private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     public bool isLoading { get; set; }
+    private SfToast ToastObj;
     private int DeleteProductId { get; set; } = 0;
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        await LoadProducts();
-    //    }
-    //}
 
     private async Task LoadProducts()
     {
@@ -112,33 +72,18 @@
             var authenticatedUser = await userManager.GetUserAsync(user);
             authenticatedUserId = authenticatedUser.Id;
             products = await _product.GetAll(authenticatedUserId);
+            ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId);
         }
-
-        isLoading = false;
     }
-
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
+        StateHasChanged();
         await Task.Run(LoadProducts);
+        isLoading = false;
+        StateHasChanged();
     }
-
-    //private void Delete(int id)
-    //{
-    //    DeleteProductId = id;
-    //    _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
-    //}
-
-    //public async Task ConfirmDelete_Click(bool isConfirmed)
-    //{
-    //    if (isConfirmed && DeleteProductId != 0)
-    //    {
-    //        // delete
-    //        await _product.Delete(DeleteProductId);
-    //        await LoadProducts();
-    //        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
-    //    }
-    //}
 
     public async Task OnActionBegin(ActionEventArgs<ProductDTO> args)
     {
@@ -159,8 +104,17 @@
         if (args.RequestType.ToString() == "Delete")
         {
             Console.WriteLine("delete");
-            await _product.Delete(args.Data.Id);
-            products = await _product.GetAll(authenticatedUserId);
+            var DeleteProductComponent = ProductComponents.FirstOrDefault(p => p.ComponentProductId == args.Data.Id);
+            if (DeleteProductComponent != null)
+            {
+                args.Cancel = true;
+                ShowToast();
+            }
+            else
+            {
+                await _product.Delete(args.Data.Id);
+                products = await _product.GetAll(authenticatedUserId);
+            }
         }
     }
 
@@ -180,6 +134,12 @@
     public void OnCommandClicked(CommandClickEventArgs<ProductDTO> args)
     {
         _nav.NavigateTo($"product/price/{args.RowData.Id}");
+    }
+
+    private string ToastContent = "<div> Please delete after removing from recepe.</div>";
+    private async Task ShowToast()
+    {
+        await this.ToastObj.ShowAsync();
     }
 }
 
