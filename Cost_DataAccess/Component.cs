@@ -9,17 +9,16 @@ namespace Cost_DataAccess
         [Key]
         public int ComponentId { get; set; }
         public string Name { get; set; }
-        public string UoM { get; set; } //unit of measure kg, liter, kWh, hour, ounce, etc.
-        public double Price { get; set; } // price per unit of measure
+        public double Amount { get; set; }
+        public string UoM { get; set; }
+        public double Price { get; set; }
         public string? Other { get; set; }
         public string UserId { get; set; }
-        public double Wastage { get; set; }
+        public double Wastage { get; set; } = 0;
+        public string? Vendor { get; set; }
 
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
-
-        //public ICollection<Product>? Products { get; set; }
-        //public ICollection<ProductComponent> ProductComponent { get; set; }
 
         public string CreatedBy { get; set; }
         public DateTime CreatedTimestamp { get; set; }

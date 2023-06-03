@@ -8,14 +8,12 @@ namespace Cost_Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }
+        public double Price { get; set; }
 
         [Required(ErrorMessage = "Please enter name..")]
         public string Name { get; set; }
         public double Cost { get; set; }
         public double CostWastage { get; set; }
         public string? Other { get; set; }
-
-        //[Required(ErrorMessage = "Please enter at least one ingredient..")]
-        //public List<Component> Components { get; set; }
     }
 }

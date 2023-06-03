@@ -45,9 +45,11 @@ namespace Cost_Services
             {
                 objFromDb.Name  = objDTO.Name;
                 objFromDb.Price = objDTO.Price;
+                objFromDb.Amount = objDTO.Amount;
                 objFromDb.UoM   = objDTO.UoM;
                 objFromDb.Other = objDTO.Other;
                 objFromDb.Wastage = objDTO.Wastage;
+                objFromDb.Vendor = objDTO.Vendor;
                 objFromDb.UpdatedBy         = objDTO.UserId;
                 objFromDb.UpdatedTimestamp  = DateTime.Now;
 

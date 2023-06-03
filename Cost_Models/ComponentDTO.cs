@@ -13,9 +13,14 @@ namespace Cost_Models
 
         [Required]
         [Range(0.01, int.MaxValue, ErrorMessage = "Price must be greater than 0.01")]
-        public double Price { get; set; } // price per unit of measure
+        public double Price { get; set; }
+        public double? UnitPrice { get; set; }
         public double Wastage { get; set; }
+        public string? Vendor { get; set; }
 
+        [Required]
+        [Range(0.01, int.MaxValue, ErrorMessage = "Price must be greater than 0.01")]
+        public double Amount { get; set; }
         [Required(ErrorMessage = "Please enter unit of measure")]
         public string UoM { get; set; } //unit of measure kg, liter, kWh, hour, ounce, etc.
         public string? Other { get; set; }
