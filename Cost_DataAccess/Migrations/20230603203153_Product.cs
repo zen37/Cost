@@ -5,25 +5,25 @@
 namespace CostDataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class UserIdProductComponent : Migration
+    public partial class Product : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "UserId",
-                table: "ProductComponent",
-                type: "nvarchar(max)",
+            migrationBuilder.AddColumn<double>(
+                name: "Price",
+                table: "Products",
+                type: "float",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: 0.0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "ProductComponent");
+                name: "Price",
+                table: "Products");
         }
     }
 }

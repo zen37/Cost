@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CostDataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230429031417_ProductComponent")]
-    partial class ProductComponent
+    [Migration("20230603203153_Product")]
+    partial class Product
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,7 @@ namespace CostDataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComponentId"));
 
-                    b.Property<double>("BasePrice")
+                    b.Property<double>("Amount")
                         .HasColumnType("float");
 
                     b.Property<string>("CreatedBy")
@@ -76,9 +76,6 @@ namespace CostDataAccess.Migrations
 
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -105,6 +102,9 @@ namespace CostDataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Vendor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("Wastage")
                         .HasColumnType("float");
 
@@ -129,6 +129,9 @@ namespace CostDataAccess.Migrations
                     b.Property<DateTime>("CostCalculatedLast")
                         .HasColumnType("datetime2");
 
+                    b.Property<double>("CostWastage")
+                        .HasColumnType("float");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -136,15 +139,15 @@ namespace CostDataAccess.Migrations
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Other")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
@@ -175,15 +178,22 @@ namespace CostDataAccess.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ComponentIngredientId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("ComponentId")
+                    b.Property<int?>("ComponentProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UoM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

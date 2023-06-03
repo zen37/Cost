@@ -75,6 +75,7 @@ namespace Cost_Services
             if (objFromDb != null)
             {
                 objFromDb.Name = objDTO.Name;
+                objFromDb.Price = objDTO.Price;
                 objFromDb.Other = objDTO.Other;
                 objFromDb.Cost= objDTO.Cost;
                 objFromDb.CostWastage = objDTO.CostWastage;

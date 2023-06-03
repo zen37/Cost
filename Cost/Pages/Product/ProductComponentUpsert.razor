@@ -85,7 +85,7 @@ else
         </GridColumns>
     </SfGrid>
 
-    <button class="btn btn-primary" @onclick="()=>Save(Id)">Save</button>
+    <button class="btn btn-primary" @onclick="()=>Save(Id)">Back</button>
 }
 
 @code {
@@ -142,41 +142,36 @@ else
         }
     }
 
-    private void GetProperty(ProductComponentDTO component)
+    private void GetProperty(ProductComponentDTO comp)
     {
-        component.ProductId = Id;
-        if (component.ComponentIngredientId != null)
+        comp.ProductId = Id;
+        if (comp.ComponentIngredientId != null)
         {
-            var ingredient = Components.FirstOrDefault(c => c.ComponentId == component.ComponentIngredientId);
-            if (ingredient != null)
+            var c = Components.FirstOrDefault(c => c.ComponentId == comp.ComponentIngredientId);
+            if (c != null)
             {
-                component.Name = ingredient.Name;
-                component.Category = "ingredient";
-                component.FromUoM = ingredient.UoM;
-                component.FromPrice = ingredient.Price;
-                component.FromPriceWastage = Math.Round(ingredient.Price * 100 / (100 - ingredient.Wastage), 2);
-                component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
-                component.PriceWastage = CalculatePrice(component.FromUoM, component.UoM, component.FromPriceWastage, component.Amount);
+                comp.Name = c.Name;
+                comp.Category = "ingredient";
+                comp.UoM = c.UoM;
+                comp.Price = CalculatePrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
             }
         }
-        else if (component.ComponentProductId != null)
+        else if (comp.ComponentProductId != null)
         {
-            var product = Products.FirstOrDefault(p => p.Id == component.ComponentProductId);
-            if (product != null)
+            var p = Products.FirstOrDefault(p => p.Id == comp.ComponentProductId);
+            if (p != null)
             {
-                component.Name = product.Name;
-                component.Category = "product";
-                component.FromUoM = "each";
-                component.FromPrice = product.Cost;
-                component.FromPriceWastage = product.CostWastage;
-                component.Price = CalculatePrice(component.FromUoM, component.UoM, component.FromPrice, component.Amount);
-                component.PriceWastage = CalculatePrice(component.FromUoM, component.UoM, component.FromPriceWastage, component.Amount);
+                comp.Name = p.Name;
+                comp.Category = "product";
+                comp.Price = CalculatePrice(comp.UoM, p.Cost, comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.UoM, p.CostWastage, comp.Amount);
             }
         }
         else
         {
-            component.Name = "Not Found";
-            component.Category = "Not Found";
+            comp.Name = "Not Found";
+            comp.Category = "Not Found";
         }
         return;
     }
@@ -205,34 +200,29 @@ else
         {
             Console.WriteLine("save");
             comp.ProductId = Product.Id;
+            if (comp.Category == "ingredient")
+            {
+                var c = Components.FirstOrDefault(x => x.Name == comp.Name);
+                comp.ComponentIngredientId = c.ComponentId;
+                comp.UserId = authenticatedUserId;
+                comp.Price = CalculatePrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
+            }
+            else
+            {
+                var p = Products.FirstOrDefault(x => x.Name == comp.Name);
+                comp.ComponentProductId = p.Id;
+                comp.UserId = authenticatedUserId;
+                comp.Price = CalculatePrice(comp.UoM, p.Cost, comp.Amount);
+                comp.PriceWastage = CalculatePrice(comp.UoM, p.CostWastage, comp.Amount);
+            }
+
             if (comp.Id == 0)
             {
-                if (comp.Category == "ingredient")
-                {
-                    var c = Components.FirstOrDefault(x => x.Name == comp.Name);
-                    comp.ComponentIngredientId = c.ComponentId;
-                    comp.FromUoM = c.UoM;
-                    comp.FromPrice = c.Price;
-                    comp.FromPriceWastage = c.Price * 100 / (100 - c.Wastage);
-                    comp.UserId = authenticatedUserId;
-                }
-                else
-                {
-                    var p = Products.FirstOrDefault(x => x.Name == comp.Name);
-                    comp.ComponentProductId = p.Id;
-                    comp.FromUoM = "each";
-                    comp.FromPrice = p.Cost;
-                    comp.FromPriceWastage = p.CostWastage;
-                    comp.UserId = authenticatedUserId;
-                }
-                comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
-                comp.PriceWastage = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPriceWastage, comp.Amount);
                 await _ProductComponentRepository.Create(comp);
             }
             else
             {
-                comp.Price = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPrice, comp.Amount);
-                comp.PriceWastage = CalculatePrice(comp.FromUoM, comp.UoM, comp.FromPriceWastage, comp.Amount);
                 await _ProductComponentRepository.Update(comp);
             }
         }
@@ -277,17 +267,10 @@ else
         }
     }
 
-    private double CalculatePrice(string FromUoM, string ToUoM, double FromUoMPrice, double Amount)
+    private double CalculatePrice(string UoM, double UoMPrice, double Amount)
     {
-        double Factor = UnitConverter(FromUoM, ToUoM);
-        return FromUoMPrice * Factor * Amount;
-    }
-
-    private double UnitConverter(string FromUoM, string ToUoM)
-    {
-        double FromFactor = UtilitiesUoM.GetFactorbyUoMName(FromUoM);
-        double ToFactor = UtilitiesUoM.GetFactorbyUoMName(ToUoM);
-        return ToFactor / FromFactor;
+        double Factor = UtilitiesUoM.GetFactorbyUoMName(UoM);
+        return UoMPrice * Factor * Amount;
     }
 
     private void GetValidUoM(string Name)
