@@ -3,6 +3,7 @@ using Cost_DataAccess;
 using Cost_Models;
 using Microsoft.EntityFrameworkCore;
 using Cost_Services.IRepository;
+using System;
 
 
 namespace Cost_Services.Repository
@@ -85,9 +86,6 @@ namespace Cost_Services.Repository
                 var objFromDb = await _db.ProductComponent.FirstOrDefaultAsync(u => u.Id == objDTO.Id);
                 if (objFromDb != null)
                 {
-                    objFromDb.ProductId = objDTO.ProductId;
-                    objFromDb.ComponentIngredientId = objDTO.ComponentIngredientId;
-                    objFromDb.ComponentProductId = objDTO.ComponentProductId;
                     objFromDb.Amount = objDTO.Amount;
                     objFromDb.UoM = objDTO.UoM;
                 }

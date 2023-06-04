@@ -85,6 +85,7 @@ else
         </GridColumns>
     </SfGrid>
 
+    <br/>
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Back</button>
 }
 
@@ -200,29 +201,40 @@ else
         {
             Console.WriteLine("save");
             comp.ProductId = Product.Id;
-            if (comp.Category == "ingredient")
-            {
-                var c = Components.FirstOrDefault(x => x.Name == comp.Name);
-                comp.ComponentIngredientId = c.ComponentId;
-                comp.UserId = authenticatedUserId;
-                comp.Price = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
-                comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
-            }
-            else
-            {
-                var p = Products.FirstOrDefault(x => x.Name == comp.Name);
-                comp.ComponentProductId = p.Id;
-                comp.UserId = authenticatedUserId;
-                comp.Price = Calculate.GetProductComponentPrice(comp.UoM, p.Cost, comp.Amount);
-                comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, p.CostWastage, comp.Amount);
-            }
-
             if (comp.Id == 0)
             {
+                if (comp.Category == "ingredient")
+                {
+                    var c = Components.FirstOrDefault(x => x.Name == comp.Name);
+                    comp.ComponentIngredientId = c.ComponentId;
+                    comp.UserId = authenticatedUserId;
+                    comp.Price = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
+                    comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
+                }
+                else
+                {
+                    var p = Products.FirstOrDefault(x => x.Name == comp.Name);
+                    comp.ComponentProductId = p.Id;
+                    comp.UserId = authenticatedUserId;
+                    comp.Price = Calculate.GetProductComponentPrice(comp.UoM, p.Cost, comp.Amount);
+                    comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, p.CostWastage, comp.Amount);
+                }
                 await _ProductComponentRepository.Create(comp);
             }
             else
             {
+                if (comp.Category == "ingredient")
+                {
+                    var c = Components.FirstOrDefault(x => x.ComponentId == comp.ComponentIngredientId);
+                    comp.Price = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
+                    comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
+                }
+                else
+                {
+                    var p = Products.FirstOrDefault(x => x.Id == comp.ComponentProductId);
+                    comp.Price = Calculate.GetProductComponentPrice(comp.UoM, p.Cost, comp.Amount);
+                    comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, p.CostWastage, comp.Amount);
+                }
                 await _ProductComponentRepository.Update(comp);
             }
         }
