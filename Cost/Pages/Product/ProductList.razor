@@ -1,6 +1,7 @@
 ﻿@page "/products"
 
-@inject IProductRepository _product
+@inject IComponentRepository _componentRepository
+@inject IProductRepository _productRepository
 @inject NavigationManager _nav
 @inject IProductComponentRepository _ProductComponentRepository
 
@@ -15,7 +16,7 @@
             </div>
         </div>
 
-        @if (products == null)
+        @if (Products == null)
         {
             <p><em>Loading...</em></p>
         }
@@ -26,7 +27,7 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
-            <SfGrid @ref="Grid" DataSource="@products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
+            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
                 <GridPageSettings PageSize="10"></GridPageSettings>
                 <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
@@ -35,6 +36,8 @@
                     <GridColumn Field=@nameof(ProductDTO.Price) HeaderText="Price"></GridColumn>
                     <GridColumn Field=@nameof(ProductDTO.Cost) HeaderText="Cost" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
                     <GridColumn Field=@nameof(ProductDTO.CostWastage) HeaderText="Cost Wastage" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
                     <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
                     <GridColumn HeaderText="Manage Records">
                         <GridCommandColumns>
@@ -53,13 +56,14 @@
 
 @code {
 
-        [Inject]
-        UserManager<IdentityUser>? userManager { get; set; }
-        [CascadingParameter]
-        public Task<AuthenticationState>? authenticationState { get; set; }
+    [Inject]
+    UserManager<IdentityUser>? userManager { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState>? authenticationState { get; set; }
     private string? authenticatedUserId;
     private SfGrid<ProductDTO>? Grid { get; set; }
-    private IEnumerable<ProductDTO> products { get; set; } = new List<ProductDTO>();
+    private IEnumerable<ComponentDTO> Components { get; set; } = new List<ComponentDTO>();
+    private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     public bool isLoading { get; set; }
     private SfToast ToastObj;
@@ -67,23 +71,66 @@
 
     private async Task LoadProducts()
     {
-        var user = (await authenticationState).User;
-        if (user.Identity.IsAuthenticated)
+        if (authenticatedUserId != null)
         {
-            var authenticatedUser = await userManager.GetUserAsync(user);
-            authenticatedUserId = authenticatedUser.Id;
-            products = await _product.GetAll(authenticatedUserId);
+            Products = await _productRepository.GetAll(authenticatedUserId);
+            Components = await _componentRepository.GetAll(authenticatedUserId);
             ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId);
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task CalculateProductPrice()
     {
-        isLoading = true;
-        StateHasChanged();
-        await Task.Run(LoadProducts);
-        isLoading = false;
-        StateHasChanged();
+        foreach (var prod in Products)
+        {
+            prod.Cost = 0;
+            prod.CostWastage = 0;
+            foreach (var comp in ProductComponents)
+            {
+                if (comp.ProductId == prod.Id)
+                {
+                    if (comp.ComponentIngredientId != null)
+                    {
+                        var c = Components.FirstOrDefault(c => c.ComponentId == comp.ComponentIngredientId);
+                        if (c != null)
+                        {
+                            prod.Cost += Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
+                            prod.CostWastage += Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
+                        }
+                    }
+                    else if (comp.ComponentProductId != null)
+                    {
+                        var p = Products.FirstOrDefault(p => p.Id == comp.ComponentProductId);
+                        if (p != null)
+                        {
+                            prod.Cost += Calculate.GetProductComponentPrice(comp.UoM, p.Cost, comp.Amount);
+                            prod.CostWastage += Calculate.GetProductComponentPrice(comp.UoM, p.CostWastage, comp.Amount);
+                        }
+                    }
+                }
+            }
+            prod.CostPercentage = prod.Cost / prod.Price;
+            prod.CostWastagePercentage = prod.CostWastage / prod.Price;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var user = (await authenticationState).User;
+        if (firstRender)
+        {
+            isLoading = true;
+            StateHasChanged();
+            if (user.Identity.IsAuthenticated)
+            {
+                var authenticatedUser = await userManager.GetUserAsync(user);
+                authenticatedUserId = authenticatedUser.Id;
+            }
+            await Task.Run(LoadProducts);
+            await Task.Run(CalculateProductPrice);
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     public async Task OnActionBegin(ActionEventArgs<ProductDTO> args)
@@ -94,12 +141,12 @@
             if (args.Data.Id == 0)
             {
                 args.Data.UserId = authenticatedUserId;
-                await _product.Create(args.Data);
+                await _productRepository.Create(args.Data);
             }
             else
             {
                 args.Data.UserId = authenticatedUserId;
-                await _product.Update(args.Data);
+                await _productRepository.Update(args.Data);
             }
         }
         if (args.RequestType.ToString() == "Delete")
@@ -113,8 +160,8 @@
             }
             else
             {
-                await _product.Delete(args.Data.Id);
-                products = await _product.GetAll(authenticatedUserId);
+                await _productRepository.Delete(args.Data.Id);
+                Products = await _productRepository.GetAll(authenticatedUserId);
             }
         }
     }
@@ -127,7 +174,7 @@
         }
         if (args.RequestType.ToString() == "Save")
         {
-            products = await _product.GetAll(authenticatedUserId);
+            Products = await _productRepository.GetAll(authenticatedUserId);
             await Grid.Refresh();
         }
     }

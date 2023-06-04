@@ -14,6 +14,8 @@ namespace Cost_Models
         public string Name { get; set; }
         public double Cost { get; set; }
         public double CostWastage { get; set; }
+        public double? CostPercentage { get; set; }
+        public double? CostWastagePercentage { get; set; }
         public string? Other { get; set; }
     }
 }
