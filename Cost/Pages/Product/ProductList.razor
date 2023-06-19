@@ -152,8 +152,8 @@
         if (args.RequestType.ToString() == "Delete")
         {
             Console.WriteLine("delete");
-            var DeleteProductComponent = ProductComponents.FirstOrDefault(p => p.ComponentProductId == args.Data.Id);
-            if (DeleteProductComponent != null)
+            var cp = ProductComponents.FirstOrDefault(p => p.ComponentProductId == args.Data.Id);
+            if (cp != null)
             {
                 args.Cancel = true;
                 ShowToast();
@@ -162,6 +162,13 @@
             {
                 await _productRepository.Delete(args.Data.Id);
                 Products = await _productRepository.GetAll(authenticatedUserId);
+                foreach (var c in ProductComponents)
+                {
+                    if (c.ProductId == args.Data.Id)
+                    {
+                        await _ProductComponentRepository.Delete(c.Id);
+                    }
+                }
             }
         }
     }

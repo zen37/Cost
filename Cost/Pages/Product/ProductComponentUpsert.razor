@@ -153,7 +153,6 @@ else
             {
                 comp.Name = c.Name;
                 comp.Category = "ingredient";
-                comp.UoM = c.UoM;
                 comp.Price = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
                 comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
             }
