@@ -27,8 +27,8 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
-            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update"})">
-                <GridPageSettings PageSize="10"></GridPageSettings>
+            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete"})">
+                <GridPageSettings PageSize="30"></GridPageSettings>
                 <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                 <GridColumns>
@@ -39,7 +39,7 @@
                     <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
                     <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
                     <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
-                    <GridColumn HeaderText="Manage Records">
+                    <GridColumn HeaderText="Ingredients">
                         <GridCommandColumns>
                             <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { Content = "Details", CssClass = "e-flat" })"></GridCommandColumn>
                         </GridCommandColumns>
@@ -182,6 +182,8 @@
         if (args.RequestType.ToString() == "Save")
         {
             Products = await _productRepository.GetAll(authenticatedUserId);
+            await Task.Run(LoadProducts);
+            await Task.Run(CalculateProductPrice);
             await Grid.Refresh();
         }
     }
