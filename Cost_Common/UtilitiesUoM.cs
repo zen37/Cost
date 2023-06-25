@@ -132,5 +132,30 @@ namespace Cost_Common
             }
             return factor;
         }
+
+        public static string GetBaseUnit(string name)
+        {
+            var cls = GetClassbyName(name);
+            if (cls == "weight")
+            {
+                return "gram";
+            }
+            else if (cls == "volume")
+            {
+                return "milliliter";
+            }
+            else if (cls == "time")
+            {
+                return "minute";
+            }
+            else if (cls == "energy")
+            {
+                return "kWh";
+            }
+            else
+            {
+                return "each";
+            }
+        }
     }
 }
