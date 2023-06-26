@@ -27,9 +27,21 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
+            <SfDialog @ref="Dialog" Width="250px" Visible="false" ShowCloseIcon="true" IsModal="true">
+                <DialogEvents Closed="Closed"></DialogEvents>
+                <DialogTemplates>
+                    <Header> Delete Record</Header>
+                    <Content> Are you sure you want to delete @SelectedData.Name ?</Content>
+                </DialogTemplates>
+                <DialogButtons>
+                    <DialogButton OnClick="@OkClick" Content="OK" IsPrimary="true"></DialogButton>
+                    <DialogButton OnClick="@CancelClick" Content="Cancel"></DialogButton>
+                </DialogButtons>
+            </SfDialog>
+
             <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                 <GridPageSettings PageSize="30"></GridPageSettings>
-                <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductDTO"></GridEvents>
+                <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                 <GridColumns>
                     <GridColumn Field=@nameof(ProductDTO.Name) HeaderText="Name" IsPrimaryKey="true"></GridColumn>
@@ -66,8 +78,10 @@
     private IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     public bool isLoading { get; set; }
+    private SfDialog Dialog;
+    public ProductDTO SelectedData;
+    public bool flag = true;
     private SfToast ToastObj;
-    private int DeleteProductId { get; set; } = 0;
 
     private async Task LoadProducts()
     {
@@ -160,14 +174,10 @@
             }
             else
             {
-                await _productRepository.Delete(args.Data.Id);
-                Products = await _productRepository.GetAll(authenticatedUserId);
-                foreach (var c in ProductComponents)
+                if (flag)
                 {
-                    if (c.ProductId == args.Data.Id)
-                    {
-                        await _ProductComponentRepository.Delete(c.Id);
-                    }
+                    await Dialog.ShowAsync();
+                    flag = false;
                 }
             }
         }
@@ -197,6 +207,39 @@
     private async Task ShowToast()
     {
         await this.ToastObj.ShowAsync();
+    }
+
+    public void Closed()
+    {
+        flag = true;
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<ProductDTO> Args)
+    {
+        SelectedData = Args.Data;
+    }
+
+    private async void OkClick()
+    {
+        await _productRepository.Delete(SelectedData.Id);
+        Products = await _productRepository.GetAll(authenticatedUserId);
+        foreach (var c in ProductComponents)
+        {
+            if (c.ProductId == SelectedData.Id)
+            {
+                await _ProductComponentRepository.Delete(c.Id);
+            }
+        }
+        await Dialog.HideAsync();
+        await Task.Run(LoadProducts);
+        await Grid.Refresh();
+    }
+
+    private async void CancelClick()
+    {
+        await Dialog.HideAsync();
+        await Task.Run(LoadProducts);
+        await Grid.Refresh();
     }
 }
 

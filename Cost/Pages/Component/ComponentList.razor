@@ -20,9 +20,21 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
+            <SfDialog @ref="Dialog" Width="250px" Visible="false" ShowCloseIcon="true" IsModal="true">
+                <DialogEvents Closed="Closed"></DialogEvents>
+                <DialogTemplates>
+                    <Header> Delete Record</Header>
+                    <Content> Are you sure you want to delete @SelectedData.Name ?</Content>
+                </DialogTemplates>
+                <DialogButtons>
+                    <DialogButton OnClick="@OkClick" Content="OK" IsPrimary="true"></DialogButton>
+                    <DialogButton OnClick="@CancelClick" Content="Cancel"></DialogButton>
+                </DialogButtons>
+            </SfDialog>
+
             <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                 <GridPageSettings PageSize="30"></GridPageSettings>
-                <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ComponentDTO"></GridEvents>
+                <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ComponentDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                 <GridColumns>
                     <GridColumn Field=@nameof(ComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false"></GridColumn>
@@ -68,6 +80,9 @@
     private IEnumerable<ComponentDTO> components { get; set; } = new List<ComponentDTO>();
     private IEnumerable<ProductComponentDTO> ProductComponents { get; set; } = new List<ProductComponentDTO>();
     private SfGrid<ComponentDTO> Grid { get; set; }
+    private SfDialog Dialog;
+    public ComponentDTO SelectedData;
+    public bool flag = true;
     private SfToast ToastObj;
     static List<string> UnitsOfMeasure = new List<string>();
 
@@ -126,8 +141,11 @@
             }
             else
             {
-                await _component.Delete(args.Data.ComponentId);
-                await Task.Run(LoadComponents);
+                if (flag)
+                {
+                    await Dialog.ShowAsync();
+                    flag = false;
+                }
             }
         }
     }
@@ -149,6 +167,31 @@
     private async Task ShowToast()
     {
         await this.ToastObj.ShowAsync();
+    }
+
+    public void Closed()
+    {
+        flag = true;
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<ComponentDTO> Args)
+    {
+        SelectedData = Args.Data;
+    }
+
+    private async void OkClick()
+    {
+        await _component.Delete(SelectedData.ComponentId);
+        await Dialog.HideAsync();
+        await Task.Run(LoadComponents);
+        await Grid.Refresh();
+    }
+
+    private async void CancelClick()
+    {
+        await Dialog.HideAsync();
+        await Task.Run(LoadComponents);
+        await Grid.Refresh();
     }
 }
 
