@@ -23,9 +23,21 @@ else
         </div>
     </div>
 
+    <SfDialog @ref="Dialog" Width="250px" Visible="false" ShowCloseIcon="true" IsModal="true">
+        <DialogEvents Closed="Closed"></DialogEvents>
+        <DialogTemplates>
+            <Header> Delete Record</Header>
+            <Content> Are you sure you want to delete @SelectedData.Name ?</Content>
+        </DialogTemplates>
+        <DialogButtons>
+            <DialogButton OnClick="@OkClick" Content="OK" IsPrimary="true"></DialogButton>
+            <DialogButton OnClick="@CancelClick" Content="Cancel"></DialogButton>
+        </DialogButtons>
+    </SfDialog>
+
     <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update", "Search"})">
         <GridPageSettings PageSize="30"></GridPageSettings>
-        <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductComponentDTO"></GridEvents>
+        <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductComponentDTO"></GridEvents>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
 
         <GridAggregates>
@@ -85,7 +97,7 @@ else
         </GridColumns>
     </SfGrid>
 
-    <br/>
+    <br />
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Back</button>
 }
 
@@ -104,6 +116,9 @@ else
     private IEnumerable<string> ProductSelect = new List<string>();
     private IEnumerable<string> IngredientSelect = new List<string>();
     SfGrid<ProductComponentDTO> Grid { get; set; }
+    private SfDialog Dialog;
+    public ProductComponentDTO SelectedData;
+    public bool flag = true;
     [Inject]
     UserManager<IdentityUser> userManager { get; set; }
     [CascadingParameter]
@@ -251,13 +266,11 @@ else
         if (args.RequestType.Equals(Action.Delete))
         {
             Console.WriteLine("delete");
-            await _ProductComponentRepository.Delete(comp.Id);
-            ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
-            foreach (var pc in ProductComponents)
+            if (flag)
             {
-                GetProperty(pc);
+                await Dialog.ShowAsync();
+                flag = false;
             }
-            UpdateSelect();
         }
     }
 
@@ -300,5 +313,40 @@ else
     {
         await _productRepository.Update(Product);
         _nav.NavigateTo("products");
+    }
+
+    public void Closed()
+    {
+        flag = true;
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<ProductComponentDTO> Args)
+    {
+        SelectedData = Args.Data;
+    }
+
+    private async void OkClick()
+    {
+        await _ProductComponentRepository.Delete(SelectedData.Id);
+        ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
+        foreach (var pc in ProductComponents)
+        {
+            GetProperty(pc);
+        }
+        UpdateSelect();
+        await Dialog.HideAsync();
+        await Grid.Refresh();
+    }
+
+    private async void CancelClick()
+    {
+        ProductComponents = await _ProductComponentRepository.GetAll(authenticatedUserId, Id);
+        foreach (var pc in ProductComponents)
+        {
+            GetProperty(pc);
+        }
+        UpdateSelect();
+        await Dialog.HideAsync();
+        await Grid.Refresh();
     }
 }
