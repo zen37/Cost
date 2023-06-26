@@ -27,7 +27,7 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
-            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete"})">
+            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                 <GridPageSettings PageSize="30"></GridPageSettings>
                 <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ProductDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
