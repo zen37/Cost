@@ -20,7 +20,7 @@
                 <ToastPosition X="Center"></ToastPosition>
             </SfToast>
 
-            <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete"})">
+            <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                 <GridPageSettings PageSize="30"></GridPageSettings>
                 <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" TValue="ComponentDTO"></GridEvents>
                 <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
