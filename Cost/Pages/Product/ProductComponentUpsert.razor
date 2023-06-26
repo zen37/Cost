@@ -305,7 +305,7 @@ else
 
     private void UpdateSelect()
     {
-        ProductSelect = Products.Where(p => !ProductComponents.Any(c => c.ComponentProductId == p.Id || c.ProductId == p.Id)).Select(p => p.Name).ToList();
+        ProductSelect = Products.Where(p => !ProductComponents.Any(c => c.ComponentProductId == p.Id || c.ProductId == p.Id) && p.Id != Id).Select(p => p.Name).ToList();
         IngredientSelect = Components.Where(p => !ProductComponents.Any(c => c.ComponentIngredientId == p.ComponentId)).Select(p => p.Name).ToList();
     }
 
