@@ -15,6 +15,7 @@ namespace Cost_Common
         private static List<string> lstNameUoM = new List<string>();
         private static List<UoM> lstClass = new List<UoM>();
         private static string? className;
+        private static string? abbreviation;
         private static double factor;
 
         private static readonly List<UoM> lstUoM = new List<UoM>()
@@ -121,6 +122,18 @@ namespace Cost_Common
             return className;
         }
 
+        public static string GetAbbreviationbyName(string name)
+        {
+            foreach (UoM unit in lstUoM)
+            {
+                if (name == unit.Name)
+                {
+                    abbreviation = unit.Abbreviation;
+                }
+            }
+            return abbreviation;
+        }
+
         public static double GetFactorbyUoMName(string UoMName)
         {
             foreach (UoM unit in lstUoM)
@@ -135,18 +148,18 @@ namespace Cost_Common
 
         public static string GetBaseUnit(string name)
         {
-            var cls = GetClassbyName(name);
+            var cls = GetClassbyAbbreviation(name);
             if (cls == "weight")
             {
-                return "gram";
+                return "g";
             }
             else if (cls == "volume")
             {
-                return "milliliter";
+                return "ml";
             }
             else if (cls == "time")
             {
-                return "minute";
+                return "m";
             }
             else if (cls == "energy")
             {
@@ -154,7 +167,7 @@ namespace Cost_Common
             }
             else
             {
-                return "each";
+                return "ea";
             }
         }
     }
