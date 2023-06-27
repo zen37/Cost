@@ -39,25 +39,27 @@
                 </DialogButtons>
             </SfDialog>
 
-            <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
-                <GridPageSettings PageSize="30"></GridPageSettings>
-                <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductDTO"></GridEvents>
-                <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
-                <GridColumns>
-                    <GridColumn Field=@nameof(ProductDTO.Name) HeaderText="Name" IsPrimaryKey="true"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.Price) HeaderText="Price"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.Cost) HeaderText="Cost" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.CostWastage) HeaderText="Cost Wastage" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                    <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
-                    <GridColumn HeaderText="Ingredients">
-                        <GridCommandColumns>
-                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { Content = "Details", CssClass = "e-flat" })"></GridCommandColumn>
-                        </GridCommandColumns>
-                    </GridColumn>
-                </GridColumns>
-            </SfGrid>
+            <div style="width:calc(100vw - 20rem); height:calc(100vh - 10rem);">
+                <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
+                    <GridPageSettings PageSize="30"></GridPageSettings>
+                    <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductDTO"></GridEvents>
+                    <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+                    <GridColumns>
+                        <GridColumn Field=@nameof(ProductDTO.Name) HeaderText="Name" IsPrimaryKey="true"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Price) HeaderText="Price"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Cost) HeaderText="Cost" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostWastage) HeaderText="Cost Wastage" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
+                        <GridColumn HeaderText="Ingredients">
+                            <GridCommandColumns>
+                                <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { Content = "Details", CssClass = "e-flat" })"></GridCommandColumn>
+                            </GridCommandColumns>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
         }
     </Authorized>
     <NotAuthorized>
