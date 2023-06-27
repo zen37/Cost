@@ -35,67 +35,69 @@ else
         </DialogButtons>
     </SfDialog>
 
-    <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update", "Search"})">
-        <GridPageSettings PageSize="30"></GridPageSettings>
-        <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductComponentDTO"></GridEvents>
-        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+    <div style="width:calc(100vw - 20rem); height:calc(100vh - 10rem);">
+        <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update", "Search"})">
+            <GridPageSettings PageSize="30"></GridPageSettings>
+            <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductComponentDTO"></GridEvents>
+            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
 
-        <GridAggregates>
-            <GridAggregate>
-                <GridAggregateColumns>
-                    <GridAggregateColumn Field=@nameof(ProductComponentDTO.Price) Type="AggregateType.Sum" Format="N2">
-                        <FooterTemplate>
-                            @{
-                                var aggregate = (context as AggregateTemplateContext);
-                                <div>
-                                    <p>Sum: @aggregate.Sum</p>
-                                </div>
-                                Product.Cost = double.Parse(@aggregate.Sum);
-                            }
-                        </FooterTemplate>
-                    </GridAggregateColumn>
-                    <GridAggregateColumn Field=@nameof(ProductComponentDTO.PriceWastage) Type="AggregateType.Sum" Format="N2">
-                        <FooterTemplate>
-                            @{
-                                var aggregate = (context as AggregateTemplateContext);
-                                <div>
-                                    <p>Sum: @aggregate.Sum</p>
-                                </div>
-                                Product.CostWastage = double.Parse(@aggregate.Sum);
-                            }
-                        </FooterTemplate>
-                    </GridAggregateColumn>
-                </GridAggregateColumns>
-            </GridAggregate>
-        </GridAggregates>
+            <GridAggregates>
+                <GridAggregate>
+                    <GridAggregateColumns>
+                        <GridAggregateColumn Field=@nameof(ProductComponentDTO.Price) Type="AggregateType.Sum" Format="N2">
+                            <FooterTemplate>
+                                @{
+                                    var aggregate = (context as AggregateTemplateContext);
+                                    <div>
+                                        <p>Sum: @aggregate.Sum</p>
+                                    </div>
+                                    Product.Cost = double.Parse(@aggregate.Sum);
+                                }
+                            </FooterTemplate>
+                        </GridAggregateColumn>
+                        <GridAggregateColumn Field=@nameof(ProductComponentDTO.PriceWastage) Type="AggregateType.Sum" Format="N2">
+                            <FooterTemplate>
+                                @{
+                                    var aggregate = (context as AggregateTemplateContext);
+                                    <div>
+                                        <p>Sum: @aggregate.Sum</p>
+                                    </div>
+                                    Product.CostWastage = double.Parse(@aggregate.Sum);
+                                }
+                            </FooterTemplate>
+                        </GridAggregateColumn>
+                    </GridAggregateColumns>
+                </GridAggregate>
+            </GridAggregates>
 
-        <GridColumns>
-            <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" EditType="EditType.DropDownEdit" AllowEditing="false">
-                <EditTemplate>
-                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).Category" TValue="string" TItem="string" DataSource="@Category" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
-                        <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" EditType="EditType.DropDownEdit" AllowEditing="false">
-                <EditTemplate>
-                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).Name" TValue="string" TItem="string" ID="Name" DataSource="@NameSource" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
-                        <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })">
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit">
-                <EditTemplate>
-                    <SfDropDownList @bind-Value="(context as ProductComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@ValidUoM"></SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowAdding="false" AllowEditing="false" Format="N2">
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowAdding="false" AllowEditing="false" Format="N2"></GridColumn>
-        </GridColumns>
-    </SfGrid>
+            <GridColumns>
+                <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" EditType="EditType.DropDownEdit" AllowEditing="false">
+                    <EditTemplate>
+                        <SfDropDownList @bind-Value="(context as ProductComponentDTO).Category" TValue="string" TItem="string" DataSource="@Category" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
+                            <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
+                        </SfDropDownList>
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" EditType="EditType.DropDownEdit" AllowEditing="false">
+                    <EditTemplate>
+                        <SfDropDownList @bind-Value="(context as ProductComponentDTO).Name" TValue="string" TItem="string" ID="Name" DataSource="@NameSource" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
+                            <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
+                        </SfDropDownList>
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })">
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit">
+                    <EditTemplate>
+                        <SfDropDownList @bind-Value="(context as ProductComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@ValidUoM"></SfDropDownList>
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowAdding="false" AllowEditing="false" Format="N2">
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowAdding="false" AllowEditing="false" Format="N2"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
 
     <br />
     <button class="btn btn-primary" @onclick="()=>Save(Id)">Back</button>
