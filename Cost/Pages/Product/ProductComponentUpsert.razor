@@ -35,7 +35,7 @@ else
         </DialogButtons>
     </SfDialog>
 
-    <div style="width:calc(100vw - 20rem); height:calc(100vh - 10rem);">
+    <div style="width:calc(100vw - 20rem); height:calc(100vh - 16rem);">
         <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update", "Search"})">
             <GridPageSettings PageSize="30"></GridPageSettings>
             <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductComponentDTO"></GridEvents>
@@ -170,6 +170,7 @@ else
             {
                 comp.Name = c.Name;
                 comp.Category = "ingredient";
+                comp.UoM = UtilitiesUoM.GetAbbreviationbyName(comp.UoM);
                 comp.Price = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitPrice(c.Amount, c.UoM, c.Price), comp.Amount);
                 comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, Calculate.GetUnitWastagePrice(c.Amount, c.UoM, c.Price, c.Wastage), comp.Amount);
             }
@@ -181,6 +182,7 @@ else
             {
                 comp.Name = p.Name;
                 comp.Category = "product";
+                comp.UoM = UtilitiesUoM.GetAbbreviationbyName(comp.UoM);
                 comp.Price = Calculate.GetProductComponentPrice(comp.UoM, p.Cost, comp.Amount);
                 comp.PriceWastage = Calculate.GetProductComponentPrice(comp.UoM, p.CostWastage, comp.Amount);
             }
