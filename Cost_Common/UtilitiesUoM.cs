@@ -16,6 +16,7 @@ namespace Cost_Common
         private static List<UoM> lstClass = new List<UoM>();
         private static string? className;
         private static string? abbreviation;
+        private static string? name;
         private static double factor;
 
         private static readonly List<UoM> lstUoM = new List<UoM>()
@@ -108,6 +109,18 @@ namespace Cost_Common
                 }
             }
             return className;
+        }
+
+        public static string GetNamebyAbbreviation(string abbreviation)
+        {
+            foreach (UoM unit in lstUoM)
+            {
+                if (abbreviation == unit.Abbreviation)
+                {
+                    name = unit.Name;
+                }
+            }
+            return name;
         }
 
         public static string GetClassbyName(string name)

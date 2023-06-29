@@ -21,7 +21,7 @@ namespace Cost_Models
         [Required]
         [Range(0.01, int.MaxValue, ErrorMessage = "Price must be greater than 0.01")]
         public double Amount { get; set; }
-        [Required(ErrorMessage = "Please enter unit of measure")]
+        [Required(ErrorMessage = "Please enter Qty")]
         public string UoM { get; set; } //unit of measure kg, liter, kWh, hour, ounce, etc.
         public string BaseUoM { get; set; }
         public string? Other { get; set; }
