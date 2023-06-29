@@ -35,7 +35,7 @@
                 </DialogButtons>
             </SfDialog>
 
-            <div style="height: calc(100vh - 16rem); " class=".col-12">
+            <div style="height: calc(100vh - 8rem); " class=".col-12">
                 <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                     <GridPageSettings PageSize="30"></GridPageSettings>
                     <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductDTO"></GridEvents>
