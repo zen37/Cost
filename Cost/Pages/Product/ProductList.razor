@@ -10,11 +10,7 @@
 <PageTitle>Product</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <div class="row mt-4 p-3">
-            <div class="col-6">
-                <h4 class="card-title text-primary">Product List</h4>
-            </div>
-        </div>
+        <h3>Product</h3>
 
         @if (Products == null)
         {
@@ -39,20 +35,20 @@
                 </DialogButtons>
             </SfDialog>
 
-            <div style="width:calc(100vw - 20rem); height:calc(100vh - 12rem);">
+            <div style="height: calc(100vh - 16rem); " class=".col-12">
                 <SfGrid @ref="Grid" DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                     <GridPageSettings PageSize="30"></GridPageSettings>
                     <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductDTO"></GridEvents>
                     <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                     <GridColumns>
-                        <GridColumn Field=@nameof(ProductDTO.Name) HeaderText="Name" IsPrimaryKey="true"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.Price) HeaderText="Price"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.Cost) HeaderText="Cost" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.CostWastage) HeaderText="Cost Wastage" Format="C2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other"></GridColumn>
-                        <GridColumn HeaderText="Ingredients">
+                        <GridColumn Field=@nameof(ProductDTO.Name) HeaderText="Name" IsPrimaryKey="true" Width="200"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Price) HeaderText="Price" Width="100"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Cost) HeaderText="Cost" Format="C2" AllowAdding="false" AllowEditing="false" Width="100"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostWastage) HeaderText="Cost Wastage" Format="C2" AllowAdding="false" AllowEditing="false" Width="100"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostPercentage) HeaderText="Cost(%)" Format="P2" AllowAdding="false" AllowEditing="false" Width="100"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.CostWastagePercentage) HeaderText="Cost Wastage(%)" Format="P2" AllowAdding="false" AllowEditing="false" Width="100"></GridColumn>
+                        <GridColumn Field=@nameof(ProductDTO.Other) HeaderText="Other" Width="120"></GridColumn>
+                        <GridColumn HeaderText="Ingredients" Width="90">
                             <GridCommandColumns>
                                 <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { Content = "Details", CssClass = "e-flat" })"></GridCommandColumn>
                             </GridCommandColumns>

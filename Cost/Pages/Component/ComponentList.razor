@@ -7,7 +7,7 @@
 <PageTitle>Ingredients</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <h1>Ingredients</h1>
+        <h3>Ingredients</h3>
 
         @if (components == null)
         {
@@ -32,26 +32,26 @@
                 </DialogButtons>
             </SfDialog>
 
-            <div style="width:calc(100vw - 20rem); height:calc(100vh - 10rem);">
+            <div style="height: calc(100vh - 16rem); " class=".col-12">
                 <SfGrid @ref="Grid" DataSource="@components" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Search"})">
                     <GridPageSettings PageSize="30"></GridPageSettings>
                     <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ComponentDTO"></GridEvents>
                     <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
                     <GridColumns>
-                        <GridColumn Field=@nameof(ComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.Amount) HeaderText="Amount"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.UoM) HeaderText="Qty" EditType="EditType.DropDownEdit">
+                        <GridColumn Field=@nameof(ComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" AllowEditing="false" Width="210"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.Amount) HeaderText="Amount" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.UoM) HeaderText="Qty" EditType="EditType.DropDownEdit" Width="90">
                             <EditTemplate Context="ctx">
                                 <label>Quantity</label>
                                 <SfDropDownList @bind-Value="(ctx as ComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@UnitsOfMeasure"></SfDropDownList>
                             </EditTemplate>
                         </GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.BaseUoM) HeaderText="UoM" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.Price) HeaderText="Price" Format="C2"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.UnitPrice) HeaderText="UoM Pr." Format="N3" AllowAdding="false" AllowEditing="false"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.Wastage) HeaderText="Wastage(%)" Format="N2"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.Vendor) HeaderText="Vendor"></GridColumn>
-                        <GridColumn Field=@nameof(ComponentDTO.Other) HeaderText="Other"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.BaseUoM) HeaderText="UoM" AllowAdding="false" AllowEditing="false" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.Price) HeaderText="Price" Format="C2" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.UnitPrice) HeaderText="UoM Pr." Format="N3" AllowAdding="false" AllowEditing="false" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.Wastage) HeaderText="Wastage(%)" Format="N2" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.Vendor) HeaderText="Vendor" Width="90"></GridColumn>
+                        <GridColumn Field=@nameof(ComponentDTO.Other) HeaderText="Other" Width="120"></GridColumn>
                         <GridColumn HeaderText="Manage Records" Width="150">
                             <GridCommandColumns>
                                 <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
@@ -120,9 +120,9 @@
     public async Task OnActionBegin(ActionEventArgs<ComponentDTO> args)
     {
         if (args.RequestType.ToString() == "BeginEdit")
-    {
+        {
             args.Data.UoM = UtilitiesUoM.GetNamebyAbbreviation(args.Data.UoM);
-    }
+        }
         if (args.RequestType.ToString() == "Save")
         {
             Console.WriteLine("save");
