@@ -5,21 +5,19 @@
 @inject NavigationManager _nav
 @using Action = Syncfusion.Blazor.Grids.Action
 
-<h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
+<h3>Product Price Management</h3>
 @if (isLoading)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="row border p-2 mb-4">
-        <div class="col-11">
-            <div class="card-body">
-                <h4>@Product.Name</h4>
-                <span>
-                    @Product.Other
-                </span>
-            </div>
+    <div class="row border p-2 mb-4 col-12">
+        <div class="card-body">
+            <h4>@Product.Name</h4>
+            <span>
+                @Product.Other
+            </span>
         </div>
     </div>
 
@@ -35,7 +33,7 @@ else
         </DialogButtons>
     </SfDialog>
 
-    <div style="width:calc(100vw - 20rem); height:calc(100vh - 16rem);">
+    <div style="height: calc(100vh - 16rem); " class=".col-12">
         <SfGrid @ref="Grid" DataSource="@ProductComponents" AllowPaging="true" AllowSorting="true" AllowResizing="true" Width="100%" Height="100%" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update", "Search"})">
             <GridPageSettings PageSize="30"></GridPageSettings>
             <GridEvents OnActionBegin="OnActionBegin" OnActionComplete="OnActionComplete" RowSelected="RowSelectHandler" TValue="ProductComponentDTO"></GridEvents>
@@ -71,30 +69,30 @@ else
             </GridAggregates>
 
             <GridColumns>
-                <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" EditType="EditType.DropDownEdit" AllowEditing="false">
+                <GridColumn Field=@nameof(ProductComponentDTO.Category) HeaderText="Category" EditType="EditType.DropDownEdit" AllowEditing="false" Width="120">
                     <EditTemplate>
                         <SfDropDownList @bind-Value="(context as ProductComponentDTO).Category" TValue="string" TItem="string" DataSource="@Category" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
                             <DropDownListEvents TValue="string" TItem="string" ValueChange="OnCategoryChange"></DropDownListEvents>
                         </SfDropDownList>
                     </EditTemplate>
                 </GridColumn>
-                <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" EditType="EditType.DropDownEdit" AllowEditing="false">
+                <GridColumn Field=@nameof(ProductComponentDTO.Name) HeaderText="Name" IsPrimaryKey="true" EditType="EditType.DropDownEdit" AllowEditing="false" Width="200">
                     <EditTemplate>
                         <SfDropDownList @bind-Value="(context as ProductComponentDTO).Name" TValue="string" TItem="string" ID="Name" DataSource="@NameSource" Enabled="@(((context as ProductComponentDTO).Id == 0) ? true : false)">
                             <DropDownListEvents TValue="string" TItem="string" ValueChange="OnNameChange"></DropDownListEvents>
                         </SfDropDownList>
                     </EditTemplate>
                 </GridColumn>
-                <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })">
+                <GridColumn Field=@nameof(ProductComponentDTO.Amount) HeaderText="Amount" Format="N1" ValidationRules="@(new ValidationRules{ Required= true })" Width="100">
                 </GridColumn>
-                <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit">
+                <GridColumn Field=@nameof(ProductComponentDTO.UoM) HeaderText="UoM" EditType="EditType.DropDownEdit" Width="100">
                     <EditTemplate>
                         <SfDropDownList @bind-Value="(context as ProductComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@ValidUoM"></SfDropDownList>
                     </EditTemplate>
                 </GridColumn>
-                <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowAdding="false" AllowEditing="false" Format="N2">
+                <GridColumn Field=@nameof(ProductComponentDTO.Price) HeaderText="Price" AllowAdding="false" AllowEditing="false" Format="N2" Width="100">
                 </GridColumn>
-                <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowAdding="false" AllowEditing="false" Format="N2"></GridColumn>
+                <GridColumn Field=@nameof(ProductComponentDTO.PriceWastage) HeaderText="Price(Wastage)" AllowAdding="false" AllowEditing="false" Format="N2" Width="100"></GridColumn>
             </GridColumns>
         </SfGrid>
     </div>
