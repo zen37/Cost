@@ -263,6 +263,7 @@ else
         if (args.RequestType.Equals(Action.BeginEdit))
         {
             Console.WriteLine("edit");
+            args.Data.UoM = UtilitiesUoM.GetNamebyAbbreviation(args.Data.UoM);
             GetValidUoM(comp.Name);
         }
         if (args.RequestType.Equals(Action.Delete))
