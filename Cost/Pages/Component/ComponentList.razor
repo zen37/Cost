@@ -42,7 +42,7 @@
                         <GridColumn Field=@nameof(ComponentDTO.Amount) HeaderText="Amount"></GridColumn>
                         <GridColumn Field=@nameof(ComponentDTO.UoM) HeaderText="Qty" EditType="EditType.DropDownEdit">
                             <EditTemplate Context="ctx">
-                                <label>UoM</label>
+                                <label>Qty</label>
                                 <SfDropDownList @bind-Value="(ctx as ComponentDTO).UoM" TValue="string" TItem="string" ID="UoM" DataSource="@UnitsOfMeasure"></SfDropDownList>
                             </EditTemplate>
                         </GridColumn>
@@ -119,6 +119,10 @@
 
     public async Task OnActionBegin(ActionEventArgs<ComponentDTO> args)
     {
+        if (args.RequestType.ToString() == "BeginEdit")
+    {
+            args.Data.UoM = UtilitiesUoM.GetNamebyAbbreviation(args.Data.UoM);
+    }
         if (args.RequestType.ToString() == "Save")
         {
             Console.WriteLine("save");
